@@ -78,39 +78,62 @@ h2.script{font-size:clamp(38px,8.6vw,64px);margin:0 0 26px}
 .garland.l{left:-12px}
 .garland.r{right:-12px;transform:scaleX(-1)}
 
-/* ---------- opening envelope ---------- */
+/* ---------- opening scene (video + wax seal) ---------- */
 #opening{
-  position:fixed;inset:0;z-index:1000;background:#e7dcc6;
-  display:grid;place-items:center;padding:20px;
-  transition:opacity .9s ease,visibility .9s ease;
+  position:fixed;inset:0;z-index:1000;background:#000;
+  overflow:hidden;
+  transition:opacity 1s ease,visibility 1s ease;
 }
 #opening.open{opacity:0;visibility:hidden;pointer-events:none}
-.envelope{
-  width:min(84vw,430px);aspect-ratio:2/3;position:relative;cursor:pointer;
-  border-radius:2px;overflow:hidden;box-shadow:0 26px 70px rgba(70,50,25,.3);
-  background:#f2ead9 url("umair.PNG") center/cover no-repeat;
+#openVideo{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;background:#000;display:block;
 }
-.envelope:after{
-  content:"";position:absolute;inset:0;
-  background:linear-gradient(180deg,rgba(40,30,15,.12),transparent 30%,rgba(40,30,15,.45));
+.veil{
+  position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:linear-gradient(180deg,rgba(25,18,8,.35),rgba(25,18,8,.05) 35%,rgba(25,18,8,.6));
+  transition:opacity .9s ease;
 }
 .seal{
-  position:absolute;z-index:3;left:50%;top:50%;transform:translate(-50%,-50%);
-  width:92px;height:92px;border-radius:50%;background:var(--maroon);
+  position:absolute;z-index:4;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:104px;height:104px;border-radius:50%;background:var(--maroon);
   color:#e0c27f;border:1px solid #9c7a3d;display:grid;place-items:center;
-  font-family:"Cormorant Garamond",serif;font-size:27px;letter-spacing:.04em;
-  box-shadow:0 10px 26px rgba(50,12,18,.35);
+  font-family:"Cormorant Garamond",serif;font-size:29px;letter-spacing:.04em;
+  cursor:pointer;padding:0;
+  box-shadow:0 14px 34px rgba(0,0,0,.45);
   transition:transform .8s cubic-bezier(.2,.8,.2,1),opacity .8s ease;
 }
-.open-copy{
-  position:absolute;z-index:3;bottom:44px;left:0;right:0;text-align:center;color:#fdf8ee;
-  text-shadow:0 2px 14px rgba(30,20,10,.55);
+.seal:hover{transform:translate(-50%,-50%) scale(1.06)}
+.seal:before{
+  content:"";position:absolute;inset:-14px;border-radius:50%;
+  border:1px solid rgba(224,194,127,.45);
+  animation:halo 2.6s ease-out infinite;
 }
-.open-copy .who{font-family:"Pinyon Script",cursive;font-size:30px;color:#f0dcae}
-.open-copy .tap{font-size:15px;letter-spacing:.24em;margin-top:6px}
-.envelope.clicked .seal{transform:translate(-50%,-50%) scale(1.5) rotate(10deg);opacity:0}
-.envelope.clicked{animation:zoom 1s ease forwards}
-@keyframes zoom{to{transform:scale(1.1)}}
+@keyframes halo{
+  0%{transform:scale(.92);opacity:.9}
+  100%{transform:scale(1.35);opacity:0}
+}
+.open-copy{
+  position:absolute;z-index:3;bottom:52px;left:0;right:0;text-align:center;color:#fdf8ee;
+  text-shadow:0 2px 16px rgba(0,0,0,.6);transition:opacity .7s ease;
+}
+.open-copy .who{font-family:"Pinyon Script",cursive;font-size:34px;color:#f0dcae}
+.open-copy .tap{font-size:14px;letter-spacing:.26em;margin-top:8px}
+
+/* once the seal is broken, the film plays clean */
+#opening.playing .seal{transform:translate(-50%,-50%) scale(1.6) rotate(12deg);opacity:0;pointer-events:none}
+#opening.playing .open-copy{opacity:0}
+#opening.playing .veil{opacity:0}
+#opening.playing .skip{opacity:1;visibility:visible}
+
+.skip{
+  position:absolute;right:18px;bottom:22px;z-index:5;
+  padding:10px 22px;border:1px solid rgba(255,255,255,.65);border-radius:999px;
+  background:rgba(0,0,0,.28);color:#fff;font-size:13px;letter-spacing:.18em;
+  cursor:pointer;opacity:0;visibility:hidden;
+  transition:opacity .6s ease,visibility .6s ease,background .3s,color .3s;
+}
+.skip:hover{background:#fff;color:#111}
 
 /* ---------- hero (the poster) ---------- */
 .hero{
@@ -210,7 +233,7 @@ h2.script{font-size:clamp(38px,8.6vw,64px);margin:0 0 26px}
 .reveal.show{opacity:1;transform:none}
 @media(prefers-reduced-motion:reduce){
   .reveal{opacity:1;transform:none;transition:none}
-  .envelope.clicked{animation:none}
+  .seal:before{animation:none}
   html{scroll-behavior:auto}
 }
 
@@ -285,14 +308,18 @@ h2.script{font-size:clamp(38px,8.6vw,64px);margin:0 0 26px}
 </svg>
 
 <!-- OPENING -->
+<!-- OPENING SCENE — replace opening.mp4 with your own video (same folder) -->
 <div id="opening">
-  <div class="envelope" id="envelope" role="button" tabindex="0" aria-label="Open the invitation">
-    <div class="seal">U &amp; H</div>
-    <div class="open-copy">
-      <div class="who">Umair &amp; Hunaina</div>
-      <div class="tap">Tap to open</div>
-    </div>
+  <video id="openVideo" playsinline muted preload="auto">
+    <source src="./1782224012851_1_m6ww6v.mp4" type="video/mp4">
+  </video>
+  <div class="veil"></div>
+  <div class="open-copy">
+    <div class="who">Umair &amp; Hunaina</div>
+    <div class="tap">Tap the seal</div>
   </div>
+  <button class="seal" id="seal" aria-label="Break the seal to play the invitation">U &amp; H</button>
+  <button class="skip" id="skipBtn">Skip</button>
 </div>
 
 <main id="invitation">
@@ -300,7 +327,7 @@ h2.script{font-size:clamp(38px,8.6vw,64px);margin:0 0 26px}
 <!-- HERO: the poster -->
 <section class="hero" aria-label="Welcome to the Nikkah ceremony of Umair and Hunaina">
   <div class="hero-blur" aria-hidden="true"></div>
-  <img class="hero-poster" src="./umair.PNG" alt="Welcome to the Nikkah ceremony of Umair and Hunaina">
+  <img class="hero-poster" src="umair.PNG" alt="Welcome to the Nikkah ceremony of Umair and Hunaina">
   <div class="hero-cue">Scroll<span>&#8595;</span></div>
 </section>
 
@@ -443,29 +470,59 @@ const WEDDING_DATE = new Date("September 27, 2026 17:00:00").getTime();
 const RSVP_URL = ""; // paste your Google Form / RSVP link here
 
 /* ===== OPEN THE INVITATION ===== */
-const opening  = document.getElementById("opening");
-const envelope = document.getElementById("envelope");
-const music    = document.getElementById("music");
-const musicBtn = document.getElementById("musicBtn");
+const opening   = document.getElementById("opening");
+const openVideo = document.getElementById("openVideo");
+const seal      = document.getElementById("seal");
+const skipBtn   = document.getElementById("skipBtn");
+const music     = document.getElementById("music");
+const musicBtn  = document.getElementById("musicBtn");
 
-function openInvitation(){
-  if(envelope.classList.contains("clicked")) return;
-  envelope.classList.add("clicked");
-  setTimeout(() => {
-    opening.classList.add("open");
-    document.body.classList.remove("locked");
-    window.scrollTo(0,0);
-    music.play().then(() => {
-      musicBtn.classList.add("playing");
-      musicBtn.setAttribute("aria-pressed","true");
-      musicBtn.setAttribute("aria-label","Pause music");
-    }).catch(() => {});
-  }, 600);
+let started  = false;
+let revealed = false;
+
+/* On load the video sits paused on its first frame.
+   iOS won't paint that frame until it has decoded something, so nudge it. */
+openVideo.addEventListener("loadeddata", () => {
+  if(!started && openVideo.currentTime === 0){
+    try { openVideo.currentTime = 0.05; } catch(e){}
+  }
+}, { once:true });
+
+/* Step 1 — the seal is broken, the film rolls */
+function breakSeal(){
+  if(started || revealed) return;
+  started = true;
+
+  opening.classList.add("playing");
+  openVideo.currentTime = 0;
+  openVideo.muted = false;   // the tap is the gesture that allows sound
+
+  openVideo.play().catch(() => {
+    openVideo.muted = true;                    // sound blocked? play it silent
+    openVideo.play().catch(revealSite);        // still no luck? go straight in
+  });
 }
-envelope.addEventListener("click", openInvitation);
-envelope.addEventListener("keydown", e => {
-  if(e.key === "Enter" || e.key === " "){ e.preventDefault(); openInvitation(); }
-});
+seal.addEventListener("click", breakSeal);
+
+/* Step 2 — the film ends (or is skipped) and the invitation appears */
+function revealSite(){
+  if(revealed) return;
+  revealed = true;
+
+  openVideo.pause();
+  opening.classList.add("open");
+  document.body.classList.remove("locked");
+  window.scrollTo(0,0);
+
+  music.play().then(() => {
+    musicBtn.classList.add("playing");
+    musicBtn.setAttribute("aria-pressed","true");
+    musicBtn.setAttribute("aria-label","Pause music");
+  }).catch(() => {});
+}
+openVideo.addEventListener("ended", revealSite);
+openVideo.addEventListener("error", revealSite);
+skipBtn.addEventListener("click", revealSite);
 
 /* ===== MUSIC ===== */
 musicBtn.addEventListener("click", () => {
