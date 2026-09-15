@@ -78,62 +78,47 @@ h2.script{font-size:clamp(38px,8.6vw,64px);margin:0 0 26px}
 .garland.l{left:-12px}
 .garland.r{right:-12px;transform:scaleX(-1)}
 
-/* ---------- opening scene (video + wax seal) ---------- */
+/* ---------- opening scene (envelope video) ---------- */
 #opening{
   position:fixed;inset:0;z-index:1000;background:#000;
   overflow:hidden;
-  transition:opacity 1s ease,visibility 1s ease;
+  transition:opacity 1.1s ease;
 }
-#opening.open{opacity:0;visibility:hidden;pointer-events:none}
+#opening.open{opacity:0;pointer-events:none}
+#opening.removed{visibility:hidden}
 #openVideo{
   position:absolute;inset:0;width:100%;height:100%;
-  object-fit:cover;background:#000;display:block;
+  object-fit:cover;object-position:center;background:#000;display:block;
+  pointer-events:none; /* video itself is never the trigger — only the hotspot below is */
 }
-.veil{
-  position:absolute;inset:0;z-index:2;pointer-events:none;
-  background:linear-gradient(180deg,rgba(25,18,8,.35),rgba(25,18,8,.05) 35%,rgba(25,18,8,.6));
-  transition:opacity .9s ease;
+
+/* Invisible hotspot placed over the wax seal in the video.
+   Percentages are relative to the full-bleed video, so it stays put
+   at any screen size the same way object-fit:cover keeps the seal centered.
+   Adjust --seal-top / --seal-left / --seal-w / --seal-h to match your footage. */
+.seal-hotspot{
+  --seal-top:50%;
+  --seal-left:50%;
+  --seal-w:22%;
+  --seal-h:14%;
+  position:absolute;z-index:3;
+  top:var(--seal-top);left:var(--seal-left);
+  width:var(--seal-w);height:var(--seal-h);
+  transform:translate(-50%,-50%);
+  background:transparent;border:0;padding:0;margin:0;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
 }
-.seal{
-  position:absolute;z-index:4;left:50%;top:50%;transform:translate(-50%,-50%);
-  width:104px;height:104px;border-radius:50%;background:var(--maroon);
-  color:#e0c27f;border:1px solid #9c7a3d;display:grid;place-items:center;
-  font-family:"Cormorant Garamond",serif;font-size:29px;letter-spacing:.04em;
-  cursor:pointer;padding:0;
-  box-shadow:0 14px 34px rgba(0,0,0,.45);
-  transition:transform .8s cubic-bezier(.2,.8,.2,1),opacity .8s ease;
-}
-.seal:hover{transform:translate(-50%,-50%) scale(1.06)}
-.seal:before{
-  content:"";position:absolute;inset:-14px;border-radius:50%;
-  border:1px solid rgba(224,194,127,.45);
-  animation:halo 2.6s ease-out infinite;
-}
-@keyframes halo{
-  0%{transform:scale(.92);opacity:.9}
-  100%{transform:scale(1.35);opacity:0}
-}
+#opening.playing .seal-hotspot{pointer-events:none}
+
 .open-copy{
-  position:absolute;z-index:3;bottom:52px;left:0;right:0;text-align:center;color:#fdf8ee;
-  text-shadow:0 2px 16px rgba(0,0,0,.6);transition:opacity .7s ease;
+  position:absolute;z-index:2;bottom:9%;left:0;right:0;text-align:center;
+  color:#fdf8ee;text-shadow:0 2px 16px rgba(0,0,0,.65);
+  pointer-events:none;transition:opacity .6s ease;
 }
-.open-copy .who{font-family:"Pinyon Script",cursive;font-size:34px;color:#f0dcae}
-.open-copy .tap{font-size:14px;letter-spacing:.26em;margin-top:8px}
-
-/* once the seal is broken, the film plays clean */
-#opening.playing .seal{transform:translate(-50%,-50%) scale(1.6) rotate(12deg);opacity:0;pointer-events:none}
+.open-copy .tap{
+  font-size:13px;letter-spacing:.26em;text-transform:uppercase;opacity:.9;
+}
 #opening.playing .open-copy{opacity:0}
-#opening.playing .veil{opacity:0}
-#opening.playing .skip{opacity:1;visibility:visible}
-
-.skip{
-  position:absolute;right:18px;bottom:22px;z-index:5;
-  padding:10px 22px;border:1px solid rgba(255,255,255,.65);border-radius:999px;
-  background:rgba(0,0,0,.28);color:#fff;font-size:13px;letter-spacing:.18em;
-  cursor:pointer;opacity:0;visibility:hidden;
-  transition:opacity .6s ease,visibility .6s ease,background .3s,color .3s;
-}
-.skip:hover{background:#fff;color:#111}
 
 /* ---------- hero (the poster) ---------- */
 .hero{
@@ -233,7 +218,6 @@ h2.script{font-size:clamp(38px,8.6vw,64px);margin:0 0 26px}
 .reveal.show{opacity:1;transform:none}
 @media(prefers-reduced-motion:reduce){
   .reveal{opacity:1;transform:none;transition:none}
-  .seal:before{animation:none}
   html{scroll-behavior:auto}
 }
 
@@ -308,18 +292,20 @@ h2.script{font-size:clamp(38px,8.6vw,64px);margin:0 0 26px}
 </svg>
 
 <!-- OPENING -->
-<!-- OPENING SCENE — replace opening.mp4 with your own video (same folder) -->
+<!-- OPENING SCENE — replace opening.mp4 with your envelope video (same folder) -->
 <div id="opening">
   <video id="openVideo" playsinline muted preload="auto">
     <source src="./1782224012851_1_m6ww6v.mp4" type="video/mp4">
   </video>
-  <div class="veil"></div>
-  <div class="open-copy">
-    <div class="who">Umair &amp; Hunaina</div>
-    <div class="tap">Tap the seal</div>
+
+  <!-- Invisible hotspot over the wax seal — reposition via the CSS variables
+       on .seal-hotspot (--seal-top / --seal-left / --seal-w / --seal-h) to
+       match exactly where the seal sits in your footage. -->
+  <button class="seal-hotspot" id="seal" aria-label="Tap the wax seal to open the invitation"></button>
+
+  <div class="open-copy" aria-hidden="true">
+    <div class="tap">Tap the seal to open</div>
   </div>
-  <button class="seal" id="seal" aria-label="Break the seal to play the invitation">U &amp; H</button>
-  <button class="skip" id="skipBtn">Skip</button>
 </div>
 
 <main id="invitation">
@@ -473,46 +459,47 @@ const RSVP_URL = ""; // paste your Google Form / RSVP link here
 const opening   = document.getElementById("opening");
 const openVideo = document.getElementById("openVideo");
 const seal      = document.getElementById("seal");
-const skipBtn   = document.getElementById("skipBtn");
 const music     = document.getElementById("music");
 const musicBtn  = document.getElementById("musicBtn");
 
 let started  = false;
 let revealed = false;
 
-/* On load the video sits paused on its first frame.
-   iOS won't paint that frame until it has decoded something, so nudge it. */
+/* Video loads paused on its very first frame. Some mobile browsers won't
+   paint anything until a frame has been decoded, so nudge playback position
+   by a hair without ever calling play(). */
 openVideo.addEventListener("loadeddata", () => {
   if(!started && openVideo.currentTime === 0){
-    try { openVideo.currentTime = 0.05; } catch(e){}
+    try { openVideo.currentTime = 0.03; } catch(e){}
   }
 }, { once:true });
 
-/* Step 1 — the seal is broken, the film rolls */
+/* Tap the wax seal — and only the wax seal — to begin. */
 function breakSeal(){
   if(started || revealed) return;
   started = true;
+  opening.classList.add("playing"); // fades the instruction, disables the hotspot
 
-  opening.classList.add("playing");
   openVideo.currentTime = 0;
-  openVideo.muted = false;   // the tap is the gesture that allows sound
+  openVideo.muted = false;          // this click is the gesture that allows sound
 
   openVideo.play().catch(() => {
-    openVideo.muted = true;                    // sound blocked? play it silent
-    openVideo.play().catch(revealSite);        // still no luck? go straight in
+    openVideo.muted = true;                  // sound blocked by the browser? play silent
+    openVideo.play().catch(revealSite);      // playback blocked entirely? skip straight in
   });
 }
 seal.addEventListener("click", breakSeal);
 
-/* Step 2 — the film ends (or is skipped) and the invitation appears */
+/* Video reaches its natural end — fade the whole opening layer away. */
 function revealSite(){
   if(revealed) return;
   revealed = true;
 
-  openVideo.pause();
-  opening.classList.add("open");
+  opening.classList.add("open");    // starts the 1.1s cinematic fade (see CSS)
   document.body.classList.remove("locked");
   window.scrollTo(0,0);
+
+  setTimeout(() => opening.classList.add("removed"), 1150);
 
   music.play().then(() => {
     musicBtn.classList.add("playing");
@@ -522,7 +509,6 @@ function revealSite(){
 }
 openVideo.addEventListener("ended", revealSite);
 openVideo.addEventListener("error", revealSite);
-skipBtn.addEventListener("click", revealSite);
 
 /* ===== MUSIC ===== */
 musicBtn.addEventListener("click", () => {
