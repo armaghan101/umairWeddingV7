@@ -465,14 +465,31 @@ const musicBtn  = document.getElementById("musicBtn");
 let started  = false;
 let revealed = false;
 
-/* Video loads paused on its very first frame. Some mobile browsers won't
-   paint anything until a frame has been decoded, so nudge playback position
-   by a hair without ever calling play(). */
-openVideo.addEventListener("loadeddata", () => {
-  if(!started && openVideo.currentTime === 0){
-    try { openVideo.currentTime = 0.03; } catch(e){}
+/* Mobile browsers (especially iOS Safari) often refuse to paint any frame
+   at all until playback has actually started once — leaving a black
+   rectangle instead of the envelope's first frame. The reliable fix is to
+   let it autoplay muted for an instant (which is allowed) and immediately
+   pause it, forcing that first frame to render and stay on screen. */
+function primeFirstFrame(){
+  if(started) return;
+  const wasMuted = openVideo.muted;
+  openVideo.muted = true;
+  const p = openVideo.play();
+  if(p && p.then){
+    p.then(() => {
+      if(!started){
+        openVideo.pause();
+        openVideo.currentTime = 0;
+        openVideo.muted = wasMuted;
+      }
+    }).catch(() => { openVideo.muted = wasMuted; });
   }
-}, { once:true });
+}
+if(openVideo.readyState >= 2){
+  primeFirstFrame();
+} else {
+  openVideo.addEventListener("loadeddata", primeFirstFrame, { once:true });
+}
 
 /* Tap the wax seal — and only the wax seal — to begin. */
 function breakSeal(){
