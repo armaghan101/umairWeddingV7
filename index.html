@@ -12,9 +12,9 @@
 
 <style>
 :root{
-  --paper-a:#f1e9d8;      /* upper torn sheet */
-  --paper-b:#f8f2e5;      /* lower torn sheet */
-  --paper-c:#ece3cf;      /* deeper sheet */
+  --paper-a:#f1e9d8;
+  --paper-b:#f8f2e5;
+  --paper-c:#ece3cf;
   --ink:#4a3b2c;
   --muted:#7d6e5c;
   --gold:#a5842f;
@@ -24,213 +24,640 @@
   --line:rgba(120,100,70,.25);
   --max:720px;
 }
+
 *{box-sizing:border-box}
+
 html{scroll-behavior:smooth}
+
 body{
-  margin:0;background:var(--paper-b);color:var(--ink);
-  font-family:"Cormorant Garamond",Georgia,serif;font-weight:400;
+  margin:0;
+  background:var(--paper-b);
+  color:var(--ink);
+  font-family:"Cormorant Garamond",Georgia,serif;
+  font-weight:400;
   overflow-x:hidden;
 }
-body.locked{height:100vh;overflow:hidden}
+
+body.locked{
+  height:100vh;
+  overflow:hidden;
+}
+
 button,a{font:inherit}
 a{text-decoration:none;color:inherit}
-img{max-width:100%;display:block}
-:focus-visible{outline:2px solid var(--maroon);outline-offset:4px}
+
+img{
+  max-width:100%;
+  display:block;
+}
+
+:focus-visible{
+  outline:2px solid var(--maroon);
+  outline-offset:4px;
+}
 
 /* ---------- shared section shell ---------- */
+
 .sheet{
   position:relative;
   padding:96px 24px 104px;
   overflow:hidden;
 }
+
 .sheet.a{background:var(--paper-a)}
 .sheet.b{background:var(--paper-b)}
 .sheet.c{background:var(--paper-c)}
-.inner{width:min(100%,var(--max));margin:0 auto;text-align:center;position:relative;z-index:3}
+
+.inner{
+  width:min(100%,var(--max));
+  margin:0 auto;
+  text-align:center;
+  position:relative;
+  z-index:3;
+}
 
 .torn{
-  position:absolute;left:-2%;width:104%;height:46px;z-index:2;
-  display:block;pointer-events:none;
+  position:absolute;
+  left:-2%;
+  width:104%;
+  height:46px;
+  z-index:2;
+  display:block;
+  pointer-events:none;
 }
+
 .torn.top{top:-1px}
 .torn.bottom{bottom:-1px}
 
 .script{
-  font-family:"Pinyon Script",cursive;color:var(--gold);
-  font-weight:400;line-height:1.25;
+  font-family:"Pinyon Script",cursive;
+  color:var(--gold);
+  font-weight:400;
+  line-height:1.25;
 }
-h2.script{font-size:clamp(38px,8.6vw,64px);margin:0 0 26px}
+
+h2.script{
+  font-size:clamp(38px,8.6vw,64px);
+  margin:0 0 26px;
+}
+
 .lede{
-  font-size:clamp(17px,4.4vw,20px);line-height:1.75;color:#5a4a3a;
-  max-width:33em;margin:0 auto;font-weight:400;
+  font-size:clamp(17px,4.4vw,20px);
+  line-height:1.75;
+  color:#5a4a3a;
+  max-width:33em;
+  margin:0 auto;
+  font-weight:400;
 }
+
 .rule{
-  width:120px;height:1px;margin:34px auto;
-  background:linear-gradient(90deg,transparent,var(--gold-soft),transparent);
+  width:120px;
+  height:1px;
+  margin:34px auto;
+  background:linear-gradient(
+    90deg,
+    transparent,
+    var(--gold-soft),
+    transparent
+  );
 }
-.flourish{display:block;margin:0 auto 10px;color:var(--gold-soft)}
+
+.flourish{
+  display:block;
+  margin:0 auto 10px;
+  color:var(--gold-soft);
+}
 
 /* ---------- floral garlands ---------- */
-.garland{
-  position:absolute;top:-14px;width:min(46%,290px);height:auto;z-index:1;
-  opacity:.92;pointer-events:none;
-}
-.garland.l{left:-12px}
-.garland.r{right:-12px;transform:scaleX(-1)}
 
-/* ---------- opening scene (envelope video) ---------- */
+.garland{
+  position:absolute;
+  top:-14px;
+  width:min(46%,290px);
+  height:auto;
+  z-index:1;
+  opacity:.92;
+  pointer-events:none;
+}
+
+.garland.l{left:-12px}
+
+.garland.r{
+  right:-12px;
+  transform:scaleX(-1);
+}
+
+/* ---------- opening scene ---------- */
+
 #opening{
-  position:fixed;inset:0;z-index:1000;background:#000;
-  width:100%;height:100vh;height:100dvh; /* iOS-safe viewport height */
+  position:fixed;
+  inset:0;
+  z-index:1000;
+  background:#000;
+  width:100%;
+  height:100vh;
+  height:100dvh;
   overflow:hidden;
   transition:opacity 1.1s ease;
-  -webkit-transform:translateZ(0); /* forces Safari to composite this layer, avoiding blank-frame stalls */
+  -webkit-transform:translateZ(0);
+  transform:translateZ(0);
   will-change:opacity;
 }
-#opening.open{opacity:0;pointer-events:none}
-#opening.removed{visibility:hidden}
-#openVideo{
-  position:absolute;inset:0;width:100%;height:100%;
-  object-fit:cover;object-position:center;background:#000;display:block;
-  opacity:1;visibility:visible; /* never hidden by default — this is what was rendering black */
-  pointer-events:none; /* video itself is never the trigger — only the hotspot below is */
+
+#opening.open{
+  opacity:0;
+  pointer-events:none;
 }
 
-/* Invisible hotspot placed over the wax seal in the video.
-   Percentages are relative to the full-bleed video, so it stays put
-   at any screen size the same way object-fit:cover keeps the seal centered.
-   Adjust --seal-top / --seal-left / --seal-w / --seal-h to match your footage. */
+#opening.removed{
+  visibility:hidden;
+}
+
+#openVideo{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center;
+  background:#000;
+  display:block;
+  opacity:1;
+  visibility:visible;
+  pointer-events:none;
+  -webkit-transform:translateZ(0);
+  transform:translateZ(0);
+}
+
+/* Invisible hotspot */
+
 .seal-hotspot{
   --seal-top:50%;
   --seal-left:50%;
   --seal-w:22%;
   --seal-h:14%;
-  position:absolute;z-index:3;
-  top:var(--seal-top);left:var(--seal-left);
-  width:var(--seal-w);height:var(--seal-h);
+
+  position:absolute;
+  z-index:3;
+
+  top:var(--seal-top);
+  left:var(--seal-left);
+
+  width:var(--seal-w);
+  height:var(--seal-h);
+
   transform:translate(-50%,-50%);
-  background:transparent;border:0;padding:0;margin:0;
-  cursor:pointer;-webkit-tap-highlight-color:transparent;
+
+  background:transparent;
+  border:0;
+  padding:0;
+  margin:0;
+
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
 }
-#opening.playing .seal-hotspot{pointer-events:none}
+
+#opening.playing .seal-hotspot{
+  pointer-events:none;
+}
 
 .open-copy{
-  position:absolute;z-index:2;bottom:9%;left:0;right:0;text-align:center;
-  color:#fdf8ee;text-shadow:0 2px 16px rgba(0,0,0,.65);
-  pointer-events:none;transition:opacity .6s ease;
-}
-.open-copy .tap{
-  font-size:13px;letter-spacing:.26em;text-transform:uppercase;opacity:.9;
-}
-#opening.playing .open-copy{opacity:0}
+  position:absolute;
+  z-index:2;
+  bottom:9%;
+  left:0;
+  right:0;
+  text-align:center;
 
-/* ---------- hero (custom video) ---------- */
+  color:#fdf8ee;
+
+  text-shadow:0 2px 16px rgba(0,0,0,.65);
+
+  pointer-events:none;
+
+  transition:opacity .6s ease;
+}
+
+.open-copy .tap{
+  font-size:13px;
+  letter-spacing:.26em;
+  text-transform:uppercase;
+  opacity:.9;
+}
+
+#opening.playing .open-copy{
+  opacity:0;
+}
+
+/* ---------- HERO ---------- */
+
 .hero{
-  position:relative;height:100svh;min-height:520px;
-  display:grid;place-items:center;overflow:hidden;background:#efe6d3;
+  position:relative;
+  height:100svh;
+  min-height:520px;
+
+  display:grid;
+  place-items:center;
+
+  overflow:hidden;
+
+  background:#efe6d3;
 }
+
 .hero-blur{
-  position:absolute;inset:-6%;background:url("umair.PNG") center/cover no-repeat;
-  filter:blur(26px) saturate(.9);opacity:.55;
-}
-.hero-video{
-  position:relative;z-index:2;width:100%;height:100%;
-  object-fit:cover;object-position:center;display:block;background:#efe6d3;
-  opacity:1;visibility:visible;
+  position:absolute;
+  inset:-6%;
+
+  background:url("umair.PNG") center/cover no-repeat;
+
+  filter:blur(26px) saturate(.9);
+
+  opacity:.55;
+
   -webkit-transform:translateZ(0);
+  transform:translateZ(0);
 }
+
+/*
+  IMPORTANT iPhone fix:
+  The video is no longer aggressively primed on page load.
+
+  The poster is displayed while Safari prepares the MP4.
+*/
+
+.hero-video{
+  position:relative;
+
+  z-index:2;
+
+  width:100%;
+  height:100%;
+
+  object-fit:cover;
+  object-position:center;
+
+  display:block;
+
+  background:#efe6d3;
+
+  opacity:1;
+  visibility:visible;
+
+  -webkit-transform:translateZ(0);
+  transform:translateZ(0);
+
+  -webkit-backface-visibility:hidden;
+  backface-visibility:hidden;
+}
+
 .hero-cue{
-  position:absolute;z-index:3;bottom:18px;left:0;right:0;text-align:center;
-  color:#6a5636;font-size:12px;letter-spacing:.3em;
+  position:absolute;
+  z-index:3;
+
+  bottom:18px;
+  left:0;
+  right:0;
+
+  text-align:center;
+
+  color:#6a5636;
+
+  font-size:12px;
+  letter-spacing:.3em;
 }
-.hero-cue span{display:block;font-size:17px;margin-top:4px;color:var(--gold)}
+
+.hero-cue span{
+  display:block;
+  font-size:17px;
+  margin-top:4px;
+  color:var(--gold);
+}
 
 /* ---------- bismillah / quote ---------- */
+
 .bismillah{
-  font-size:clamp(26px,7vw,40px);color:#8d6f2a;direction:rtl;
-  line-height:1.9;margin:0 0 30px;font-family:"Cormorant Garamond",serif;
+  font-size:clamp(26px,7vw,40px);
+  color:#8d6f2a;
+  direction:rtl;
+  line-height:1.9;
+  margin:0 0 30px;
+  font-family:"Cormorant Garamond",serif;
 }
-.vow{margin:0 0 30px}
-.vow div{font-family:"Pinyon Script",cursive;color:var(--gold);line-height:1.3}
-.vow .one{font-size:clamp(40px,10vw,66px)}
-.vow .two{font-size:clamp(36px,9vw,60px)}
-.vow .three{font-size:clamp(30px,7.4vw,52px)}
-.greeting{font-size:clamp(19px,5vw,24px);margin:0 0 10px;color:#54452f}
+
+.vow{
+  margin:0 0 30px;
+}
+
+.vow div{
+  font-family:"Pinyon Script",cursive;
+  color:var(--gold);
+  line-height:1.3;
+}
+
+.vow .one{
+  font-size:clamp(40px,10vw,66px);
+}
+
+.vow .two{
+  font-size:clamp(36px,9vw,60px);
+}
+
+.vow .three{
+  font-size:clamp(30px,7.4vw,52px);
+}
+
+.greeting{
+  font-size:clamp(19px,5vw,24px);
+  margin:0 0 10px;
+  color:#54452f;
+}
 
 /* ---------- countdown ---------- */
+
 .clock{
-  display:flex;align-items:flex-start;justify-content:center;
-  gap:clamp(6px,3vw,26px);margin:14px 0 0;
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+
+  gap:clamp(6px,3vw,26px);
+
+  margin:14px 0 0;
 }
-.unit{min-width:62px}
+
+.unit{
+  min-width:62px;
+}
+
 .num{
-  font-size:clamp(48px,13vw,84px);line-height:1;color:var(--gold);font-weight:400;
+  font-size:clamp(48px,13vw,84px);
+  line-height:1;
+  color:var(--gold);
+  font-weight:400;
   font-variant-numeric:tabular-nums;
 }
-.lbl{font-size:clamp(14px,3.6vw,18px);color:var(--gold-soft);margin-top:10px;letter-spacing:.02em}
-.colon{font-size:clamp(40px,10vw,66px);color:var(--gold-soft);line-height:1.1}
+
+.lbl{
+  font-size:clamp(14px,3.6vw,18px);
+  color:var(--gold-soft);
+  margin-top:10px;
+  letter-spacing:.02em;
+}
+
+.colon{
+  font-size:clamp(40px,10vw,66px);
+  color:var(--gold-soft);
+  line-height:1.1;
+}
 
 /* ---------- schedule ---------- */
-.timeline{max-width:560px;margin:8px auto 0;text-align:left}
-.event{
-  display:grid;grid-template-columns:96px 1fr;gap:20px;align-items:baseline;
-  padding:22px 4px;border-bottom:1px solid var(--line);
+
+.timeline{
+  max-width:560px;
+  margin:8px auto 0;
+  text-align:left;
 }
-.event:last-child{border-bottom:0}
-.event time{font-size:26px;color:var(--gold)}
-.event h3{font-size:26px;font-weight:500;margin:0 0 2px;color:#4a3b2c}
-.event p{margin:0;font-size:16px;color:var(--muted);font-style:italic}
+
+.event{
+  display:grid;
+  grid-template-columns:96px 1fr;
+  gap:20px;
+  align-items:baseline;
+
+  padding:22px 4px;
+
+  border-bottom:1px solid var(--line);
+}
+
+.event:last-child{
+  border-bottom:0;
+}
+
+.event time{
+  font-size:26px;
+  color:var(--gold);
+}
+
+.event h3{
+  font-size:26px;
+  font-weight:500;
+  margin:0 0 2px;
+  color:#4a3b2c;
+}
+
+.event p{
+  margin:0;
+  font-size:16px;
+  color:var(--muted);
+  font-style:italic;
+}
 
 /* ---------- venue ---------- */
-.venue-name{font-size:clamp(34px,8vw,54px);line-height:1.1;margin:0 0 14px;color:#4a3b2c}
-.address{font-size:18px;line-height:1.8;color:var(--muted);margin:0 0 30px}
-.btn{
-  display:inline-block;padding:13px 34px;border:1px solid var(--gold);
-  color:#6d5520;font-size:15px;letter-spacing:.16em;background:transparent;
-  transition:background .3s,color .3s;cursor:pointer;
+
+.venue-name{
+  font-size:clamp(34px,8vw,54px);
+  line-height:1.1;
+  margin:0 0 14px;
+  color:#4a3b2c;
 }
-.btn:hover{background:var(--gold);color:#fff8ea}
-.btn.solid{background:var(--maroon);border-color:var(--maroon);color:#f5e6c8}
-.btn.solid:hover{background:transparent;color:var(--maroon)}
+
+.address{
+  font-size:18px;
+  line-height:1.8;
+  color:var(--muted);
+  margin:0 0 30px;
+}
+
+.btn{
+  display:inline-block;
+
+  padding:13px 34px;
+
+  border:1px solid var(--gold);
+
+  color:#6d5520;
+
+  font-size:15px;
+  letter-spacing:.16em;
+
+  background:transparent;
+
+  transition:background .3s,color .3s;
+
+  cursor:pointer;
+}
+
+.btn:hover{
+  background:var(--gold);
+  color:#fff8ea;
+}
+
+.btn.solid{
+  background:var(--maroon);
+  border-color:var(--maroon);
+  color:#f5e6c8;
+}
+
+.btn.solid:hover{
+  background:transparent;
+  color:var(--maroon);
+}
 
 /* ---------- notes ---------- */
-.notes{display:grid;grid-template-columns:1fr 1fr;gap:26px;max-width:620px;margin:0 auto}
-.note{padding:30px 22px;border:1px solid var(--line);background:rgba(255,252,244,.5)}
-.note h3{font-family:"Pinyon Script",cursive;color:var(--gold);font-size:32px;margin:0 0 10px;font-weight:400}
-.note p{margin:0;font-size:16px;line-height:1.7;color:var(--muted)}
+
+.notes{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:26px;
+
+  max-width:620px;
+
+  margin:0 auto;
+}
+
+.note{
+  padding:30px 22px;
+
+  border:1px solid var(--line);
+
+  background:rgba(255,252,244,.5);
+}
+
+.note h3{
+  font-family:"Pinyon Script",cursive;
+  color:var(--gold);
+  font-size:32px;
+  margin:0 0 10px;
+  font-weight:400;
+}
+
+.note p{
+  margin:0;
+  font-size:16px;
+  line-height:1.7;
+  color:var(--muted);
+}
 
 /* ---------- footer ---------- */
-.closing .big{font-family:"Pinyon Script",cursive;color:var(--gold);font-size:clamp(46px,12vw,80px);line-height:1.2}
-.couple{font-size:clamp(24px,6vw,34px);margin-top:18px;color:#4a3b2c}
-.stamp{margin-top:40px;font-size:14px;letter-spacing:.2em;color:var(--muted)}
+
+.closing .big{
+  font-family:"Pinyon Script",cursive;
+  color:var(--gold);
+  font-size:clamp(46px,12vw,80px);
+  line-height:1.2;
+}
+
+.couple{
+  font-size:clamp(24px,6vw,34px);
+  margin-top:18px;
+  color:#4a3b2c;
+}
+
+.stamp{
+  margin-top:40px;
+  font-size:14px;
+  letter-spacing:.2em;
+  color:var(--muted);
+}
 
 /* ---------- music ---------- */
+
 .music{
-  position:fixed;right:20px;bottom:20px;z-index:90;width:62px;height:62px;
-  border:0;border-radius:50%;background:var(--maroon);color:#f3e3c4;
-  display:grid;place-items:center;cursor:pointer;
+  position:fixed;
+  right:20px;
+  bottom:20px;
+  z-index:90;
+
+  width:62px;
+  height:62px;
+
+  border:0;
+  border-radius:50%;
+
+  background:var(--maroon);
+  color:#f3e3c4;
+
+  display:grid;
+  place-items:center;
+
+  cursor:pointer;
+
   box-shadow:0 12px 26px rgba(60,15,22,.34);
 }
-.music svg{width:22px;height:22px;fill:currentColor}
-.music .ico-pause{display:none}
-.music.playing .ico-pause{display:block}
-.music.playing .ico-play{display:none}
+
+.music svg{
+  width:22px;
+  height:22px;
+  fill:currentColor;
+}
+
+.music .ico-pause{
+  display:none;
+}
+
+.music.playing .ico-pause{
+  display:block;
+}
+
+.music.playing .ico-play{
+  display:none;
+}
 
 /* ---------- reveal ---------- */
-.reveal{opacity:0;transform:translateY(22px);transition:opacity 1s ease,transform 1s ease}
-.reveal.show{opacity:1;transform:none}
+
+.reveal{
+  opacity:0;
+  transform:translateY(22px);
+
+  transition:
+    opacity 1s ease,
+    transform 1s ease;
+}
+
+.reveal.show{
+  opacity:1;
+  transform:none;
+}
+
 @media(prefers-reduced-motion:reduce){
-  .reveal{opacity:1;transform:none;transition:none}
-  html{scroll-behavior:auto}
+  .reveal{
+    opacity:1;
+    transform:none;
+    transition:none;
+  }
+
+  html{
+    scroll-behavior:auto;
+  }
 }
 
 @media(max-width:560px){
-  .sheet{padding:78px 20px 84px}
-  .notes{grid-template-columns:1fr;gap:18px}
-  .event{grid-template-columns:76px 1fr;gap:14px}
-  .event time,.event h3{font-size:23px}
-  .unit{min-width:52px}
-  .garland{width:52%}
+
+  .sheet{
+    padding:78px 20px 84px;
+  }
+
+  .notes{
+    grid-template-columns:1fr;
+    gap:18px;
+  }
+
+  .event{
+    grid-template-columns:76px 1fr;
+    gap:14px;
+  }
+
+  .event time,
+  .event h3{
+    font-size:23px;
+  }
+
+  .unit{
+    min-width:52px;
+  }
+
+  .garland{
+    width:52%;
+  }
 }
 </style>
 </head>
@@ -238,9 +665,15 @@ h2.script{font-size:clamp(38px,8.6vw,64px);margin:0 0 26px}
 <body class="locked">
 
 <!-- reusable floral art -->
+
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
-    <path id="leafShape" d="M0 0 C7 -11 20 -13 27 0 C20 13 7 11 0 0 Z"/>
+
+    <path
+      id="leafShape"
+      d="M0 0 C7 -11 20 -13 27 0 C20 13 7 11 0 0 Z"
+    />
+
     <g id="roseIvory">
       <circle r="19" fill="#f7f1e3"/>
       <path d="M-19 0 A19 19 0 0 1 19 0 Z" fill="#ece0c9"/>
@@ -249,6 +682,7 @@ h2.script{font-size:clamp(38px,8.6vw,64px);margin:0 0 26px}
       <circle r="5.5" fill="#f8f3e7"/>
       <path d="M-5.5 0 A5.5 5.5 0 0 1 5.5 0 Z" fill="#e6d8bd"/>
     </g>
+
     <g id="roseBlush">
       <circle r="16" fill="#f3e2dd"/>
       <path d="M-16 0 A16 16 0 0 1 16 0 Z" fill="#e6cdc6"/>
@@ -259,30 +693,38 @@ h2.script{font-size:clamp(38px,8.6vw,64px);margin:0 0 26px}
     </g>
 
     <symbol id="garland" viewBox="0 0 300 190">
+
       <g fill="none" stroke="#8b9b76" stroke-width="1.6" opacity=".85">
         <path d="M6 14 C70 26 118 58 152 118"/>
         <path d="M30 6 C60 52 96 78 150 92"/>
         <path d="M0 52 C44 62 74 96 92 150"/>
       </g>
+
       <g fill="#8b9b76" opacity=".8">
+
         <use href="#leafShape" transform="translate(40,26) rotate(28)"/>
         <use href="#leafShape" transform="translate(66,44) rotate(46) scale(.9)"/>
         <use href="#leafShape" transform="translate(92,66) rotate(58) scale(.95)"/>
         <use href="#leafShape" transform="translate(118,92) rotate(66) scale(.85)"/>
         <use href="#leafShape" transform="translate(136,120) rotate(78) scale(.8)"/>
+
         <use href="#leafShape" transform="translate(24,60) rotate(96) scale(.9)"/>
         <use href="#leafShape" transform="translate(44,92) rotate(104) scale(.85)"/>
         <use href="#leafShape" transform="translate(66,124) rotate(112) scale(.8)"/>
         <use href="#leafShape" transform="translate(80,152) rotate(124) scale(.72)"/>
+
         <use href="#leafShape" transform="translate(78,20) rotate(-12) scale(.85)"/>
         <use href="#leafShape" transform="translate(116,38) rotate(8) scale(.78)"/>
         <use href="#leafShape" transform="translate(150,60) rotate(24) scale(.7)"/>
+
       </g>
+
       <g fill="#a3b08d" opacity=".55">
         <use href="#leafShape" transform="translate(104,14) rotate(-24) scale(.7)"/>
         <use href="#leafShape" transform="translate(12,34) rotate(64) scale(.7)"/>
         <use href="#leafShape" transform="translate(150,96) rotate(94) scale(.65)"/>
       </g>
+
       <use href="#roseIvory" transform="translate(34,30) scale(1.25)"/>
       <use href="#roseBlush" transform="translate(88,20) scale(1.05)"/>
       <use href="#roseIvory" transform="translate(132,44) scale(.85)"/>
@@ -290,36 +732,63 @@ h2.script{font-size:clamp(38px,8.6vw,64px);margin:0 0 26px}
       <use href="#roseIvory" transform="translate(74,66) scale(.62)"/>
       <use href="#roseBlush" transform="translate(112,102) scale(.55)"/>
       <use href="#roseIvory" transform="translate(58,120) scale(.5)"/>
+
     </symbol>
   </defs>
 </svg>
 
-<!-- OPENING -->
-<!-- OPENING SCENE — replace opening.mp4 with your envelope video (same folder) -->
+
+<!-- ==================== OPENING ==================== -->
+
 <div id="opening">
-  <video id="openVideo" playsinline webkit-playsinline muted preload="auto">
-    <source src="./1782224012851_1_m6ww6v.mp4" type="video/mp4">
+
+  <video
+    id="openVideo"
+    playsinline
+    webkit-playsinline
+    muted
+    preload="auto"
+  >
+    <source
+      src="./1782224012851_1_m6ww6v.mp4"
+      type="video/mp4"
+    >
   </video>
 
-  <!-- Invisible hotspot over the wax seal — reposition via the CSS variables
-       on .seal-hotspot (--seal-top / --seal-left / --seal-w / --seal-h) to
-       match exactly where the seal sits in your footage. -->
-  <button class="seal-hotspot" id="seal" aria-label="Tap the wax seal to open the invitation"></button>
+  <button
+    class="seal-hotspot"
+    id="seal"
+    aria-label="Tap the wax seal to open the invitation"
+  ></button>
 
   <div class="open-copy" aria-hidden="true">
     <div class="tap">Tap the seal to open</div>
   </div>
+
 </div>
+
 
 <main id="invitation">
 
-<!-- HERO: custom video -->
-<section class="hero" aria-label="Welcome to the Nikkah ceremony of Umair and Hunaina">
-  <div class="hero-blur" aria-hidden="true"></div>
-  <!-- Hero video — replace hero.mp4 with your own file (same folder as index.html, exact
-       filename case matters on Vercel). It is primed (first frame rendered) as soon as
-       the page loads — while it's still hidden behind the envelope overlay — so it's
-       instantly ready with no black flash or delay once the envelope finishes. -->
+
+<!-- ==================== HERO ==================== -->
+
+<section
+  class="hero"
+  aria-label="Welcome to the Nikkah ceremony of Umair and Hunaina"
+>
+
+  <div
+    class="hero-blur"
+    aria-hidden="true"
+  ></div>
+
+  <!--
+    IMPORTANT:
+    poster="umair.PNG" gives iPhone Safari an immediate visual
+    while IMG_6263.mp4 is loading.
+  -->
+
   <video
     id="heroVideo"
     class="hero-video"
@@ -327,152 +796,478 @@ h2.script{font-size:clamp(38px,8.6vw,64px);margin:0 0 26px}
     playsinline
     webkit-playsinline
     loop
-    preload="auto"
-    aria-label="Umair and Hunaina">
-    <source src="./IMG_6263.mp4" type="video/mp4">
+    preload="metadata"
+    poster="./umair.PNG"
+    aria-label="Umair and Hunaina"
+  >
+    <source
+      src="./IMG_6263.mp4"
+      type="video/mp4"
+    >
   </video>
-  <div class="hero-cue">Scroll<span>&#8595;</span></div>
+
+  <div class="hero-cue">
+    Scroll<span>&#8595;</span>
+  </div>
+
 </section>
 
-<!-- BISMILLAH + VOW -->
-<section class="sheet a">
-  <svg class="torn top" viewBox="0 0 1200 46" preserveAspectRatio="none" aria-hidden="true">
-    <path d="M0 46 L0 12 C60 4 92 20 150 14 C210 8 252 26 312 18 C372 10 410 28 470 20 C530 12 574 30 636 22 C698 14 738 4 800 14 C862 24 900 8 962 16 C1024 24 1062 6 1120 14 C1158 19 1178 10 1200 6 L1200 46 Z" fill="#f1e9d8"/>
-  </svg>
-  <svg class="garland l" viewBox="0 0 300 190" aria-hidden="true"><use href="#garland"/></svg>
-  <svg class="garland r" viewBox="0 0 300 190" aria-hidden="true"><use href="#garland"/></svg>
 
-  <div class="inner reveal" style="padding-top:60px">
-    <p class="bismillah">&#1576;&#1616;&#1587;&#1618;&#1605;&#1616; &#1575;&#1604;&#1604;&#1607;&#1616; &#1575;&#1604;&#1585;&#1614;&#1617;&#1581;&#1618;&#1605;&#1614;&#1606;&#1616; &#1575;&#1604;&#1585;&#1614;&#1617;&#1581;&#1616;&#1610;&#1605;</p>
+<!-- ==================== BISMILLAH + VOW ==================== -->
+
+<section class="sheet a">
+
+  <svg
+    class="torn top"
+    viewBox="0 0 1200 46"
+    preserveAspectRatio="none"
+    aria-hidden="true"
+  >
+    <path
+      d="M0 46 L0 12 C60 4 92 20 150 14 C210 8 252 26 312 18 C372 10 410 28 470 20 C530 12 574 30 636 22 C698 14 738 4 800 14 C862 24 900 8 962 16 C1024 24 1062 6 1120 14 C1158 19 1178 10 1200 6 L1200 46 Z"
+      fill="#f1e9d8"
+    />
+  </svg>
+
+  <svg
+    class="garland l"
+    viewBox="0 0 300 190"
+    aria-hidden="true"
+  >
+    <use href="#garland"/>
+  </svg>
+
+  <svg
+    class="garland r"
+    viewBox="0 0 300 190"
+    aria-hidden="true"
+  >
+    <use href="#garland"/>
+  </svg>
+
+  <div
+    class="inner reveal"
+    style="padding-top:60px"
+  >
+
+    <p class="bismillah">
+      &#1576;&#1616;&#1587;&#1618;&#1605;&#1616;
+      &#1575;&#1604;&#1604;&#1607;&#1616;
+      &#1575;&#1604;&#1585;&#1614;&#1617;&#1581;&#1618;&#1605;&#1614;&#1606;&#1616;
+      &#1575;&#1604;&#1585;&#1614;&#1617;&#1581;&#1616;&#1610;&#1605;
+    </p>
+
     <div class="vow">
       <div class="one">Two Souls</div>
       <div class="two">One destiny</div>
       <div class="three">A Lifetime written by Allah</div>
     </div>
-    <p class="greeting">Dear Friends and Family</p>
-    <p class="lede">Join us for an evening of love, laughter, duas, and unforgettable memories as we begin our forever.</p>
+
+    <p class="greeting">
+      Dear Friends and Family
+    </p>
+
+    <p class="lede">
+      Join us for an evening of love, laughter, duas, and unforgettable memories as we begin our forever.
+    </p>
+
   </div>
 
-  <svg class="torn bottom" viewBox="0 0 1200 46" preserveAspectRatio="none" aria-hidden="true">
-    <path d="M0 0 L0 30 C58 40 96 24 152 32 C208 40 250 22 308 30 C366 38 408 20 468 28 C528 36 570 18 632 26 C694 34 736 44 798 34 C860 24 898 40 960 32 C1022 24 1060 42 1118 34 C1156 29 1178 38 1200 42 L1200 46 L0 46 Z" fill="#f8f2e5"/>
+  <svg
+    class="torn bottom"
+    viewBox="0 0 1200 46"
+    preserveAspectRatio="none"
+    aria-hidden="true"
+  >
+    <path
+      d="M0 0 L0 30 C58 40 96 24 152 32 C208 40 250 22 308 30 C366 38 408 20 468 28 C528 36 570 18 632 26 C694 34 736 44 798 34 C860 24 898 40 960 32 C1022 24 1060 42 1118 34 C1156 29 1178 38 1200 42 L1200 46 L0 46 Z"
+      fill="#f8f2e5"
+    />
   </svg>
+
 </section>
 
-<!-- COUNTDOWN -->
+
+<!-- ==================== COUNTDOWN ==================== -->
+
 <section class="sheet b">
+
   <div class="inner reveal">
-    <h2 class="script">The Celebration Begins In</h2>
-    <div class="clock" aria-live="off">
-      <div class="unit"><div class="num" id="days">00</div><div class="lbl">Days</div></div>
+
+    <h2 class="script">
+      The Celebration Begins In
+    </h2>
+
+    <div
+      class="clock"
+      aria-live="off"
+    >
+
+      <div class="unit">
+        <div class="num" id="days">00</div>
+        <div class="lbl">Days</div>
+      </div>
+
       <div class="colon">:</div>
-      <div class="unit"><div class="num" id="hours">00</div><div class="lbl">Hours</div></div>
+
+      <div class="unit">
+        <div class="num" id="hours">00</div>
+        <div class="lbl">Hours</div>
+      </div>
+
       <div class="colon">:</div>
-      <div class="unit"><div class="num" id="minutes">00</div><div class="lbl">Minutes</div></div>
+
+      <div class="unit">
+        <div class="num" id="minutes">00</div>
+        <div class="lbl">Minutes</div>
+      </div>
+
       <div class="colon">:</div>
-      <div class="unit"><div class="num" id="seconds">00</div><div class="lbl">Seconds</div></div>
+
+      <div class="unit">
+        <div class="num" id="seconds">00</div>
+        <div class="lbl">Seconds</div>
+      </div>
+
     </div>
+
   </div>
-  <svg class="torn bottom" viewBox="0 0 1200 46" preserveAspectRatio="none" aria-hidden="true">
-    <path d="M0 0 L0 34 C54 44 100 20 156 28 C212 36 246 18 304 26 C362 34 404 44 464 36 C524 28 566 12 628 22 C690 32 734 46 796 38 C858 30 902 14 964 24 C1026 34 1064 20 1122 28 C1158 33 1180 24 1200 20 L1200 46 L0 46 Z" fill="#ece3cf"/>
+
+  <svg
+    class="torn bottom"
+    viewBox="0 0 1200 46"
+    preserveAspectRatio="none"
+    aria-hidden="true"
+  >
+    <path
+      d="M0 0 L0 34 C54 44 100 20 156 28 C212 36 246 18 304 26 C362 34 404 44 464 36 C524 28 566 12 628 22 C690 32 734 46 796 38 C858 30 902 14 964 24 C1026 34 1064 20 1122 28 C1158 33 1180 24 1200 20 L1200 46 L0 46 Z"
+      fill="#ece3cf"
+    />
   </svg>
+
 </section>
 
-<!-- SCHEDULE -->
+
+<!-- ==================== SCHEDULE ==================== -->
+
 <section class="sheet c">
+
   <div class="inner reveal">
-    <svg class="flourish" width="150" height="16" viewBox="0 0 150 16" fill="none" stroke="currentColor" aria-hidden="true">
-      <path d="M2 8 C26 -2 46 18 70 8 C94 -2 118 18 148 8" stroke-width="1"/>
+
+    <svg
+      class="flourish"
+      width="150"
+      height="16"
+      viewBox="0 0 150 16"
+      fill="none"
+      stroke="currentColor"
+      aria-hidden="true"
+    >
+      <path
+        d="M2 8 C26 -2 46 18 70 8 C94 -2 118 18 148 8"
+        stroke-width="1"
+      />
     </svg>
-    <h2 class="script">Schedule of Events</h2>
+
+    <h2 class="script">
+      Schedule of Events
+    </h2>
+
     <div class="timeline">
-      <div class="event"><time>5 PM</time><div><h3>Guest Arrival</h3><p>Welcome and seating</p></div></div>
-      <div class="event"><time>6 PM</time><div><h3>Nikkah Ceremony</h3><p>The sacred beginning</p></div></div>
-      <div class="event"><time>7 PM</time><div><h3>Mocktail Hour</h3><p>Drinks and conversation</p></div></div>
-      <div class="event"><time>8 PM</time><div><h3>Dinner</h3><p>An evening feast</p></div></div>
-      <div class="event"><time>9 PM</time><div><h3>Celebration</h3><p>Music, duas and dancing</p></div></div>
+
+      <div class="event">
+        <time>5 PM</time>
+        <div>
+          <h3>Guest Arrival</h3>
+          <p>Welcome and seating</p>
+        </div>
+      </div>
+
+      <div class="event">
+        <time>6 PM</time>
+        <div>
+          <h3>Nikkah Ceremony</h3>
+          <p>The sacred beginning</p>
+        </div>
+      </div>
+
+      <div class="event">
+        <time>7 PM</time>
+        <div>
+          <h3>Mocktail Hour</h3>
+          <p>Drinks and conversation</p>
+        </div>
+      </div>
+
+      <div class="event">
+        <time>8 PM</time>
+        <div>
+          <h3>Dinner</h3>
+          <p>An evening feast</p>
+        </div>
+      </div>
+
+      <div class="event">
+        <time>9 PM</time>
+        <div>
+          <h3>Celebration</h3>
+          <p>Music, duas and dancing</p>
+        </div>
+      </div>
+
     </div>
+
   </div>
-  <svg class="torn bottom" viewBox="0 0 1200 46" preserveAspectRatio="none" aria-hidden="true">
-    <path d="M0 0 L0 26 C60 36 94 18 150 26 C206 34 254 46 312 38 C370 30 404 14 466 22 C528 30 574 44 636 36 C698 28 734 12 796 20 C858 28 902 44 964 36 C1026 28 1066 14 1124 22 C1160 27 1180 36 1200 40 L1200 46 L0 46 Z" fill="#f8f2e5"/>
+
+  <svg
+    class="torn bottom"
+    viewBox="0 0 1200 46"
+    preserveAspectRatio="none"
+    aria-hidden="true"
+  >
+    <path
+      d="M0 0 L0 26 C60 36 94 18 150 26 C206 34 254 46 312 38 C370 30 404 14 466 22 C528 30 574 44 636 36 C698 28 734 12 796 20 C858 28 902 44 964 36 C1026 28 1066 14 1124 22 C1160 27 1180 36 1200 40 L1200 46 L0 46 Z"
+      fill="#f8f2e5"
+    />
   </svg>
+
 </section>
 
-<!-- VENUE -->
+
+<!-- ==================== VENUE ==================== -->
+
 <section class="sheet b">
+
   <div class="inner reveal">
-    <h2 class="script">Where We Celebrate</h2>
-    <p class="venue-name">Islamic Center of Melville</p>
-    <p class="address">118 Old East Neck Road<br>Melville, NY 11747</p>
-    <a class="btn" href="https://www.google.com/maps/search/?api=1&amp;query=Islamic+Center+of+Melville" target="_blank" rel="noopener">Open in Maps</a>
+
+    <h2 class="script">
+      Where We Celebrate
+    </h2>
+
+    <p class="venue-name">
+      Islamic Center of Melville
+    </p>
+
+    <p class="address">
+      118 Old East Neck Road<br>
+      Melville, NY 11747
+    </p>
+
+    <a
+      class="btn"
+      href="https://www.google.com/maps/search/?api=1&amp;query=Islamic+Center+of+Melville"
+      target="_blank"
+      rel="noopener"
+    >
+      Open in Maps
+    </a>
+
   </div>
-  <svg class="torn bottom" viewBox="0 0 1200 46" preserveAspectRatio="none" aria-hidden="true">
-    <path d="M0 0 L0 32 C56 42 104 22 158 30 C212 38 248 20 306 28 C364 36 402 46 462 38 C522 30 568 14 630 24 C692 34 736 44 798 36 C860 28 900 12 962 22 C1024 32 1068 18 1126 26 C1160 31 1180 22 1200 18 L1200 46 L0 46 Z" fill="#f1e9d8"/>
+
+  <svg
+    class="torn bottom"
+    viewBox="0 0 1200 46"
+    preserveAspectRatio="none"
+    aria-hidden="true"
+  >
+    <path
+      d="M0 0 L0 32 C56 42 104 22 158 30 C212 38 248 20 306 28 C364 36 402 46 462 38 C522 30 568 14 630 24 C692 34 736 44 798 36 C860 28 900 12 962 22 C1024 32 1068 18 1126 26 C1160 31 1180 22 1200 18 L1200 46 L0 46 Z"
+      fill="#f1e9d8"
+    />
   </svg>
+
 </section>
 
-<!-- NOTES -->
+
+<!-- ==================== NOTES ==================== -->
+
 <section class="sheet a">
+
   <div class="inner reveal">
-    <h2 class="script">A Little Note</h2>
+
+    <h2 class="script">
+      A Little Note
+    </h2>
+
     <div class="notes">
+
       <article class="note">
         <h3>Gifts</h3>
-        <p>Your presence is the gift we are hoping for. Kindly, no boxed gifts.</p>
+        <p>
+          Your presence is the gift we are hoping for. Kindly, no boxed gifts.
+        </p>
       </article>
+
       <article class="note">
         <h3>What to Wear</h3>
-        <p>Festive traditional attire. We kindly ask guests to avoid deep red and maroon.</p>
+        <p>
+          Festive traditional attire. We kindly ask guests to avoid deep red and maroon.
+        </p>
       </article>
+
     </div>
+
   </div>
-  <svg class="torn bottom" viewBox="0 0 1200 46" preserveAspectRatio="none" aria-hidden="true">
-    <path d="M0 0 L0 28 C58 38 98 20 154 28 C210 36 250 46 308 38 C366 30 408 12 468 22 C528 32 572 44 634 36 C696 28 738 14 800 22 C862 30 904 44 966 36 C1028 28 1064 16 1122 24 C1158 29 1180 20 1200 16 L1200 46 L0 46 Z" fill="#f8f2e5"/>
+
+  <svg
+    class="torn bottom"
+    viewBox="0 0 1200 46"
+    preserveAspectRatio="none"
+    aria-hidden="true"
+  >
+    <path
+      d="M0 0 L0 28 C58 38 98 20 154 28 C210 36 250 46 308 38 C366 30 408 12 468 22 C528 32 572 44 634 36 C696 28 738 14 800 22 C862 30 904 44 966 36 C1028 28 1064 16 1122 24 C1158 29 1180 20 1200 16 L1200 46 L0 46 Z"
+      fill="#f8f2e5"
+    />
   </svg>
+
 </section>
 
-<!-- RSVP -->
+
+<!-- ==================== RSVP ==================== -->
+
 <section class="sheet b">
+
   <div class="inner reveal">
-    <h2 class="script">Will You Join Us</h2>
-    <p class="lede">So we can prepare a seat and a plate for you, please let us know by the 15th of September.</p>
+
+    <h2 class="script">
+      Will You Join Us
+    </h2>
+
+    <p class="lede">
+      So we can prepare a seat and a plate for you, please let us know by the 15th of September.
+    </p>
+
     <div class="rule"></div>
-    <a class="btn solid" href="#" onclick="openRSVP(event)">Confirm attendance</a>
+
+    <a
+      class="btn solid"
+      href="#"
+      onclick="openRSVP(event)"
+    >
+      Confirm attendance
+    </a>
+
   </div>
-  <svg class="torn bottom" viewBox="0 0 1200 46" preserveAspectRatio="none" aria-hidden="true">
-    <path d="M0 0 L0 30 C60 40 92 22 150 30 C208 38 252 20 310 28 C368 36 410 46 470 38 C530 30 574 16 636 26 C698 36 734 44 796 36 C858 28 900 14 962 24 C1024 34 1062 20 1120 28 C1158 33 1178 24 1200 20 L1200 46 L0 46 Z" fill="#ece3cf"/>
+
+  <svg
+    class="torn bottom"
+    viewBox="0 0 1200 46"
+    preserveAspectRatio="none"
+    aria-hidden="true"
+  >
+    <path
+      d="M0 0 L0 30 C60 40 92 22 150 30 C208 38 252 20 310 28 C368 36 410 46 470 38 C530 30 574 16 636 26 C698 36 734 44 796 36 C858 28 900 14 962 24 C1024 34 1062 20 1120 28 C1158 33 1178 24 1200 20 L1200 46 L0 46 Z"
+      fill="#ece3cf"
+    />
   </svg>
+
 </section>
 
-<!-- CLOSING -->
-<section class="sheet c closing" style="padding-bottom:120px">
-  <svg class="garland l" viewBox="0 0 300 190" style="top:auto;bottom:-14px;transform:scaleY(-1)" aria-hidden="true"><use href="#garland"/></svg>
-  <svg class="garland r" viewBox="0 0 300 190" style="top:auto;bottom:-14px;transform:scale(-1,-1)" aria-hidden="true"><use href="#garland"/></svg>
+
+<!-- ==================== CLOSING ==================== -->
+
+<section
+  class="sheet c closing"
+  style="padding-bottom:120px"
+>
+
+  <svg
+    class="garland l"
+    viewBox="0 0 300 190"
+    style="top:auto;bottom:-14px;transform:scaleY(-1)"
+    aria-hidden="true"
+  >
+    <use href="#garland"/>
+  </svg>
+
+  <svg
+    class="garland r"
+    viewBox="0 0 300 190"
+    style="top:auto;bottom:-14px;transform:scale(-1,-1)"
+    aria-hidden="true"
+  >
+    <use href="#garland"/>
+  </svg>
+
   <div class="inner reveal">
-    <div class="big">Hope to see<br>you there</div>
+
+    <div class="big">
+      Hope to see<br>
+      you there
+    </div>
+
     <div class="rule"></div>
-    <p class="couple">Umair &amp; Hunaina</p>
-    <p class="stamp">27 . 09 . 2026</p>
+
+    <p class="couple">
+      Umair &amp; Hunaina
+    </p>
+
+    <p class="stamp">
+      27 . 09 . 2026
+    </p>
+
   </div>
+
 </section>
+
 
 </main>
 
-<button class="music" id="musicBtn" aria-label="Play music" aria-pressed="false">
-  <svg class="ico-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
-  <svg class="ico-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+
+<!-- ==================== MUSIC ==================== -->
+
+<button
+  class="music"
+  id="musicBtn"
+  aria-label="Play music"
+  aria-pressed="false"
+>
+
+  <svg
+    class="ico-play"
+    viewBox="0 0 24 24"
+    aria-hidden="true"
+  >
+    <path d="M8 5v14l11-7z"/>
+  </svg>
+
+  <svg
+    class="ico-pause"
+    viewBox="0 0 24 24"
+    aria-hidden="true"
+  >
+    <path d="M6 5h4v14H6zM14 5h4v14h-4z"/>
+  </svg>
+
 </button>
 
-<!-- Put your MP3 in the same folder and name it music.mp3 -->
-<audio id="music" loop preload="auto">
+
+<audio
+  id="music"
+  loop
+  preload="auto"
+>
   <source src="music.mp3" type="audio/mpeg">
 </audio>
 
-<script>
-/* ===== CONFIGURATION ===== */
-const WEDDING_DATE = new Date("September 27, 2026 17:00:00").getTime();
-const RSVP_URL = ""; // paste your Google Form / RSVP link here
 
-/* ===== OPEN THE INVITATION ===== */
+<script>
+
+/* =========================================================
+   CONFIGURATION
+========================================================= */
+
+const WEDDING_DATE =
+  new Date("September 27, 2026 17:00:00").getTime();
+
+const RSVP_URL = "";
+
+
+/* =========================================================
+   ELEMENTS
+========================================================= */
+
 const opening   = document.getElementById("opening");
 const openVideo = document.getElementById("openVideo");
 const seal      = document.getElementById("seal");
@@ -480,188 +1275,588 @@ const heroVideo = document.getElementById("heroVideo");
 const music     = document.getElementById("music");
 const musicBtn  = document.getElementById("musicBtn");
 
+
+/* =========================================================
+   STATE
+========================================================= */
+
 let started  = false;
 let revealed = false;
 let primed   = false;
-let heroPrimed = false;
 let fallbackTimer = null;
 
-/* iOS Safari (especially over cellular) often refuses to paint any frame
-   at all until playback has actually started once — leaving a black
-   rectangle instead of the envelope's first frame. The fix is to let it
-   autoplay muted for an instant (allowed by iOS) and immediately pause it,
-   forcing that first frame to render and stay on screen. We attempt this
-   on every readiness event iOS might fire, and retry a few times, because
-   which event actually fires first is inconsistent across iOS versions. */
+
+/* =========================================================
+   OPENING VIDEO
+   iOS SAFARI FIRST-FRAME FIX
+========================================================= */
+
 function primeFirstFrame(){
+
   if(started || primed) return;
+
   const wasMuted = openVideo.muted;
+
   openVideo.muted = true;
   openVideo.defaultMuted = true;
-  const p = openVideo.play();
-  if(p && p.then){
-    p.then(() => {
+
+  const promise = openVideo.play();
+
+  if(promise && promise.then){
+
+    promise.then(() => {
+
       if(!started){
+
         primed = true;
+
         openVideo.pause();
-        openVideo.currentTime = 0;
+
+        try{
+          openVideo.currentTime = 0;
+        }catch(e){}
+
         openVideo.muted = wasMuted;
       }
-    }).catch(() => { openVideo.muted = wasMuted; });
-  }
-}
-["loadedmetadata","loadeddata","canplay","canplaythrough"].forEach(evt =>
-  openVideo.addEventListener(evt, primeFirstFrame, { once:true })
-);
-openVideo.load();                       // force iOS to start fetching immediately
-if(openVideo.readyState >= 1) primeFirstFrame();
-[120, 500, 1200].forEach(ms => setTimeout(primeFirstFrame, ms)); // retry net for slow connections
-window.addEventListener("pageshow", primeFirstFrame);           // iOS back/forward cache restores
 
-/* Same treatment for the hero video, done while it's still hidden behind
-   the envelope overlay (opacity/z-index, not display:none, so priming it
-   here doesn't flash anything). By the time revealSite() runs, its first
-   frame is already rendered and buffered, so it starts instantly with no
-   black flash or delay on iPhone. It stays muted throughout — no unmute
-   step is needed since this is a silent background video. */
-function primeHero(){
-  if(!heroVideo || heroPrimed) return;
-  const p = heroVideo.play();
-  if(p && p.then){
-    p.then(() => {
-      heroPrimed = true;
-      if(!revealed){ heroVideo.pause(); heroVideo.currentTime = 0; }
-    }).catch(() => {});
+    }).catch(() => {
+
+      openVideo.muted = wasMuted;
+
+    });
+
   }
 }
-if(heroVideo){
-  ["loadedmetadata","loadeddata","canplay","canplaythrough"].forEach(evt =>
-    heroVideo.addEventListener(evt, primeHero, { once:true })
+
+
+[
+  "loadedmetadata",
+  "loadeddata",
+  "canplay",
+  "canplaythrough"
+].forEach(eventName => {
+
+  openVideo.addEventListener(
+    eventName,
+    primeFirstFrame,
+    {once:true}
   );
-  heroVideo.load();
-  if(heroVideo.readyState >= 1) primeHero();
-  [150, 600, 1500].forEach(ms => setTimeout(primeHero, ms));
-}
 
-/* Tap the wax seal — and only the wax seal — to begin. */
-function breakSeal(){
-  if(started || revealed) return;
-  started = true;
-  opening.classList.add("playing"); // fades the instruction, disables the hotspot
-
-  if(openVideo.currentTime > 0.05) openVideo.currentTime = 0; // avoid an unnecessary re-seek/stall
-  openVideo.muted = false;          // this click is the gesture that allows sound
-
-  openVideo.play().catch(() => {
-    openVideo.muted = true;                  // sound blocked by the browser? play silent
-    openVideo.play().catch(revealSite);      // playback blocked entirely? skip straight in
-  });
-}
-seal.addEventListener("click", breakSeal);
-
-/* Safety net: iOS occasionally never fires 'ended' (backgrounding, stalls).
-   Once real playback begins, schedule a fallback reveal slightly after the
-   video's known duration, so guests are never stuck looking at a black
-   screen. It's cancelled the moment 'ended' fires normally. */
-openVideo.addEventListener("playing", () => {
-  if(!started || revealed || fallbackTimer) return;
-  const dur = openVideo.duration;
-  if(isFinite(dur) && dur > 0){
-    fallbackTimer = setTimeout(revealSite, (dur - openVideo.currentTime) * 1000 + 800);
-  }
 });
 
-/* Video reaches its natural end — fade the whole opening layer away. */
-function revealSite(){
-  if(revealed) return;
-  revealed = true;
-  if(fallbackTimer){ clearTimeout(fallbackTimer); fallbackTimer = null; }
 
-  opening.classList.add("open");    // starts the 1.1s cinematic fade (see CSS)
+openVideo.load();
+
+if(openVideo.readyState >= 1){
+  primeFirstFrame();
+}
+
+
+[120,500,1200].forEach(ms => {
+
+  setTimeout(
+    primeFirstFrame,
+    ms
+  );
+
+});
+
+
+window.addEventListener(
+  "pageshow",
+  primeFirstFrame
+);
+
+
+/* =========================================================
+   OPENING — WAX SEAL
+========================================================= */
+
+function breakSeal(){
+
+  if(started || revealed) return;
+
+  started = true;
+
+  opening.classList.add("playing");
+
+  if(openVideo.currentTime > 0.05){
+
+    try{
+      openVideo.currentTime = 0;
+    }catch(e){}
+
+  }
+
+  /*
+    The user's tap is a real interaction,
+    so Safari allows the video to play with sound.
+  */
+
+  openVideo.muted = false;
+
+  const promise = openVideo.play();
+
+  if(promise && promise.catch){
+
+    promise.catch(() => {
+
+      /*
+        If Safari blocks audio, continue silently.
+      */
+
+      openVideo.muted = true;
+
+      openVideo.play().catch(() => {
+
+        revealSite();
+
+      });
+
+    });
+
+  }
+
+}
+
+
+seal.addEventListener(
+  "click",
+  breakSeal
+);
+
+
+/* =========================================================
+   OPENING VIDEO SAFETY FALLBACK
+========================================================= */
+
+openVideo.addEventListener(
+  "playing",
+  () => {
+
+    if(
+      !started ||
+      revealed ||
+      fallbackTimer
+    ){
+      return;
+    }
+
+    const duration = openVideo.duration;
+
+    if(
+      isFinite(duration) &&
+      duration > 0
+    ){
+
+      fallbackTimer = setTimeout(
+        revealSite,
+        (duration - openVideo.currentTime) * 1000 + 800
+      );
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   REVEAL WEBSITE
+========================================================= */
+
+function revealSite(){
+
+  if(revealed) return;
+
+  revealed = true;
+
+  if(fallbackTimer){
+
+    clearTimeout(fallbackTimer);
+
+    fallbackTimer = null;
+
+  }
+
+
+  /*
+    Fade the envelope away.
+  */
+
+  opening.classList.add("open");
+
   document.body.classList.remove("locked");
+
   window.scrollTo(0,0);
 
-  setTimeout(() => opening.classList.add("removed"), 1150);
 
-  // Hero video is only ever started here — never on page load. It was
-  // already primed above, so this should start instantly with no delay.
+  setTimeout(
+    () => {
+      opening.classList.add("removed");
+    },
+    1150
+  );
+
+
+  /* =======================================================
+     HERO VIDEO — iPHONE / SAFARI FIX
+
+     The Hero video is NOT played on page load.
+
+     It starts only after the envelope has finished.
+  ======================================================= */
+
   if(heroVideo){
-    heroVideo.currentTime = 0;
-    const hp = heroVideo.play();
-    if(hp && hp.catch){
-      hp.catch(() => {
-        // one retry shortly after, in case iOS needed a beat post-transition
-        setTimeout(() => heroVideo.play().catch(() => {}), 300);
-      });
+
+    /*
+      Explicitly tell Safari this is a muted inline video.
+    */
+
+    heroVideo.muted = true;
+    heroVideo.defaultMuted = true;
+
+    /*
+      Make sure inline playback is enabled.
+    */
+
+    heroVideo.setAttribute(
+      "playsinline",
+      ""
+    );
+
+    heroVideo.setAttribute(
+      "webkit-playsinline",
+      ""
+    );
+
+
+    const playHeroVideo = () => {
+
+      /*
+        Start from the beginning.
+      */
+
+      try{
+        heroVideo.currentTime = 0;
+      }catch(e){}
+
+
+      const promise = heroVideo.play();
+
+
+      if(promise && promise.catch){
+
+        promise.catch(() => {
+
+          /*
+            Safari may need a tiny delay immediately
+            after the opening overlay disappears.
+          */
+
+          setTimeout(() => {
+
+            heroVideo.play().catch(() => {});
+
+          },300);
+
+        });
+
+      }
+
+    };
+
+
+    /*
+      If enough data is already available,
+      play immediately.
+    */
+
+    if(heroVideo.readyState >= 2){
+
+      playHeroVideo();
+
+    }else{
+
+      /*
+        Otherwise wait until Safari says the
+        video can actually play.
+      */
+
+      heroVideo.addEventListener(
+        "canplay",
+        playHeroVideo,
+        {once:true}
+      );
+
     }
+
+
+    /*
+      Extra fallback for slower iPhones / cellular networks.
+    */
+
+    setTimeout(() => {
+
+      if(
+        heroVideo.paused &&
+        !heroVideo.ended
+      ){
+
+        heroVideo.play().catch(() => {});
+
+      }
+
+    },1000);
+
   }
+
+
+  /* =======================================================
+     MUSIC
+  ======================================================= */
 
   music.play().then(() => {
+
     musicBtn.classList.add("playing");
-    musicBtn.setAttribute("aria-pressed","true");
-    musicBtn.setAttribute("aria-label","Pause music");
+
+    musicBtn.setAttribute(
+      "aria-pressed",
+      "true"
+    );
+
+    musicBtn.setAttribute(
+      "aria-label",
+      "Pause music"
+    );
+
   }).catch(() => {});
+
 }
-openVideo.addEventListener("ended", revealSite);
-openVideo.addEventListener("error", revealSite);
 
-/* ===== MUSIC ===== */
-musicBtn.addEventListener("click", () => {
-  if(music.paused){
-    music.play().then(() => {
-      musicBtn.classList.add("playing");
-      musicBtn.setAttribute("aria-pressed","true");
-      musicBtn.setAttribute("aria-label","Pause music");
-    }).catch(()=>{});
-  } else {
-    music.pause();
-    musicBtn.classList.remove("playing");
-    musicBtn.setAttribute("aria-pressed","false");
-    musicBtn.setAttribute("aria-label","Play music");
-  }
-});
 
-/* ===== COUNTDOWN ===== */
-const pad = n => String(n).padStart(2,"0");
-function updateCountdown(){
-  let diff = WEDDING_DATE - Date.now();
-  if(diff < 0) diff = 0;
-  const days    = Math.floor(diff / 86400000); diff %= 86400000;
-  const hours   = Math.floor(diff / 3600000);  diff %= 3600000;
-  const minutes = Math.floor(diff / 60000);
-  const seconds = Math.floor((diff % 60000) / 1000);
-  days_el.textContent    = pad(days);
-  hours_el.textContent   = pad(hours);
-  minutes_el.textContent = pad(minutes);
-  seconds_el.textContent = pad(seconds);
-}
-const days_el    = document.getElementById("days");
-const hours_el   = document.getElementById("hours");
-const minutes_el = document.getElementById("minutes");
-const seconds_el = document.getElementById("seconds");
-updateCountdown();
-setInterval(updateCountdown, 1000);
+/*
+  Normal ending.
+*/
 
-/* ===== SCROLL REVEALS ===== */
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(entry => {
-    if(entry.isIntersecting){
-      entry.target.classList.add("show");
-      observer.unobserve(entry.target);
+openVideo.addEventListener(
+  "ended",
+  revealSite
+);
+
+
+/*
+  If the opening video encounters an error,
+  don't leave the visitor stuck.
+*/
+
+openVideo.addEventListener(
+  "error",
+  revealSite
+);
+
+
+/* =========================================================
+   MUSIC
+========================================================= */
+
+musicBtn.addEventListener(
+  "click",
+  () => {
+
+    if(music.paused){
+
+      music.play().then(() => {
+
+        musicBtn.classList.add("playing");
+
+        musicBtn.setAttribute(
+          "aria-pressed",
+          "true"
+        );
+
+        musicBtn.setAttribute(
+          "aria-label",
+          "Pause music"
+        );
+
+      }).catch(() => {});
+
+    }else{
+
+      music.pause();
+
+      musicBtn.classList.remove(
+        "playing"
+      );
+
+      musicBtn.setAttribute(
+        "aria-pressed",
+        "false"
+      );
+
+      musicBtn.setAttribute(
+        "aria-label",
+        "Play music"
+      );
+
     }
-  });
-},{threshold:.15});
-document.querySelectorAll(".reveal").forEach(el => observer.observe(el));
 
-/* ===== RSVP ===== */
-function openRSVP(e){
-  e.preventDefault();
-  if(RSVP_URL){
-    window.open(RSVP_URL,"_blank","noopener");
-  } else {
-    alert("Add your RSVP link to the RSVP_URL value at the top of the script in index.html.");
   }
+);
+
+
+/* =========================================================
+   COUNTDOWN
+========================================================= */
+
+const pad = n =>
+  String(n).padStart(2,"0");
+
+
+const days_el =
+  document.getElementById("days");
+
+const hours_el =
+  document.getElementById("hours");
+
+const minutes_el =
+  document.getElementById("minutes");
+
+const seconds_el =
+  document.getElementById("seconds");
+
+
+function updateCountdown(){
+
+  let diff =
+    WEDDING_DATE - Date.now();
+
+
+  if(diff < 0){
+    diff = 0;
+  }
+
+
+  const days =
+    Math.floor(
+      diff / 86400000
+    );
+
+
+  diff %= 86400000;
+
+
+  const hours =
+    Math.floor(
+      diff / 3600000
+    );
+
+
+  diff %= 3600000;
+
+
+  const minutes =
+    Math.floor(
+      diff / 60000
+    );
+
+
+  const seconds =
+    Math.floor(
+      (diff % 60000) / 1000
+    );
+
+
+  days_el.textContent =
+    pad(days);
+
+  hours_el.textContent =
+    pad(hours);
+
+  minutes_el.textContent =
+    pad(minutes);
+
+  seconds_el.textContent =
+    pad(seconds);
+
 }
+
+
+updateCountdown();
+
+setInterval(
+  updateCountdown,
+  1000
+);
+
+
+/* =========================================================
+   SCROLL REVEALS
+========================================================= */
+
+const observer =
+  new IntersectionObserver(
+    entries => {
+
+      entries.forEach(entry => {
+
+        if(entry.isIntersecting){
+
+          entry.target.classList.add(
+            "show"
+          );
+
+          observer.unobserve(
+            entry.target
+          );
+
+        }
+
+      });
+
+    },
+    {
+      threshold:.15
+    }
+  );
+
+
+document
+  .querySelectorAll(".reveal")
+  .forEach(el => {
+
+    observer.observe(el);
+
+  });
+
+
+/* =========================================================
+   RSVP
+========================================================= */
+
+function openRSVP(e){
+
+  e.preventDefault();
+
+  if(RSVP_URL){
+
+    window.open(
+      RSVP_URL,
+      "_blank",
+      "noopener"
+    );
+
+  }else{
+
+    alert(
+      "Add your RSVP link to the RSVP_URL value at the top of the script in index.html."
+    );
+
+  }
+
+}
+
 </script>
+
 </body>
 </html>
