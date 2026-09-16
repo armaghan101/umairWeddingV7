@@ -303,11 +303,26 @@ h2.script{
   opacity:1;
   visibility:visible;
 
-  -webkit-transform:translateZ(0);
-  transform:translateZ(0);
-
   -webkit-backface-visibility:hidden;
   backface-visibility:hidden;
+
+  /* Crops out a burned-in watermark by zooming in slightly and anchoring
+     the scale to the corner OPPOSITE the watermark — that corner stays
+     put, and the extra size pushes the watermark's corner past the
+     container edge, where .hero's overflow:hidden clips it off.
+     Defaults assume a bottom-right watermark (anchored top-left).
+     If yours sits elsewhere, change --hero-origin accordingly:
+       bottom-right watermark → 0% 0%   (top-left anchor)   [default]
+       bottom-left  watermark → 100% 0% (top-right anchor)
+       top-right    watermark → 0% 100% (bottom-left anchor)
+       top-left     watermark → 100% 100% (bottom-right anchor)
+     Increase --hero-zoom if the logo is large or close to center. */
+  --hero-zoom:1.16;
+  --hero-origin:0% 0%;
+  -webkit-transform:translateZ(0) scale(var(--hero-zoom));
+  transform:translateZ(0) scale(var(--hero-zoom));
+  -webkit-transform-origin:var(--hero-origin);
+  transform-origin:var(--hero-origin);
 }
 
 .hero-cue{
@@ -408,28 +423,8 @@ h2.script{
   text-shadow:0 4px 20px rgba(0,0,0,.55);
 }
 
-/* Covers a burned-in watermark near a corner of the video.
-   Adjust the four values below to match exactly where it sits
-   in your footage (they default to the bottom-right corner,
-   the most common placement for these watermarks). */
-.wm-cover{
-  --wm-bottom:0;
-  --wm-right:0;
-  --wm-w:170px;
-  --wm-h:46px;
 
-  position:absolute;
-  z-index:4;
-  bottom:var(--wm-bottom);
-  right:var(--wm-right);
-  width:var(--wm-w);
-  height:var(--wm-h);
 
-  pointer-events:none;
-  -webkit-backdrop-filter:blur(9px) saturate(110%);
-  backdrop-filter:blur(9px) saturate(110%);
-  background:rgba(20,14,6,.28);
-}
 
 /* ---------- bismillah / quote ---------- */
 
@@ -960,11 +955,6 @@ h2.script{
     <p class="eyebrow and"><span class="dash"></span>and<span class="dash"></span></p>
     <div class="script">Hunaina</div>
   </div>
-
-  <!-- Hides a burned-in watermark logo in the video's corner.
-       Reposition via the --wm-* variables on .wm-cover in the CSS
-       above once you see exactly where it sits in your footage. -->
-  <div class="wm-cover" aria-hidden="true"></div>
 
   <div class="hero-cue">
     Scroll<span>&#8595;</span>
