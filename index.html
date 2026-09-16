@@ -366,6 +366,49 @@ h2.script{
   font-size:clamp(30px,7.4vw,52px);
 }
 
+.welcome{
+  margin:0 0 30px;
+}
+
+.eyebrow{
+  font-size:clamp(14px,3.6vw,19px);
+  letter-spacing:.32em;
+  text-transform:uppercase;
+  color:#6d5520;
+  margin:0 0 4px;
+  font-weight:500;
+}
+
+.eyebrow.small{
+  margin:0 0 16px;
+}
+
+.eyebrow.and{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:16px;
+  margin:16px 0;
+  color:var(--gold-soft);
+  letter-spacing:.3em;
+  font-size:15px;
+}
+
+.eyebrow .dash{
+  width:36px;
+  height:1px;
+  background:var(--gold-soft);
+  display:inline-block;
+}
+
+.welcome .script{
+  font-family:"Pinyon Script",cursive;
+  color:var(--gold);
+  font-size:clamp(46px,12vw,80px);
+  line-height:1.15;
+  margin:2px 0;
+}
+
 .greeting{
   font-size:clamp(19px,5vw,24px);
   margin:0 0 10px;
@@ -795,8 +838,7 @@ h2.script{
     muted
     playsinline
     webkit-playsinline
-    loop
-    preload="metadata"
+    preload="auto"
     poster="./umair.PNG"
     aria-label="Umair and Hunaina"
   >
@@ -857,10 +899,13 @@ h2.script{
       &#1575;&#1604;&#1585;&#1614;&#1617;&#1581;&#1616;&#1610;&#1605;
     </p>
 
-    <div class="vow">
-      <div class="one">Two Souls</div>
-      <div class="two">One destiny</div>
-      <div class="three">A Lifetime written by Allah</div>
+    <div class="welcome">
+      <p class="eyebrow">Welcome to the</p>
+      <p class="eyebrow">Nikkah Ceremony</p>
+      <p class="eyebrow small">of</p>
+      <div class="script">Umair</div>
+      <p class="eyebrow and"><span class="dash"></span>and<span class="dash"></span></p>
+      <div class="script">Hunaina</div>
     </div>
 
     <p class="greeting">
@@ -1372,6 +1417,69 @@ window.addEventListener(
    OPENING — WAX SEAL
 ========================================================= */
 
+/* =========================================================
+   HERO VIDEO — start it on the seal tap, not at reveal
+
+   Starting it here (same trusted user-gesture as the envelope
+   video) means it has the ENTIRE envelope-video duration to
+   buffer and settle into smooth playback while hidden behind
+   the opening overlay. That's what removes the poster-flash /
+   background-color-flash / late-video sequence at reveal time —
+   by then it's already mid-playback, not starting cold.
+========================================================= */
+
+let heroStarted = false;
+
+function startHeroVideo(){
+
+  if(!heroVideo || heroStarted) return;
+  heroStarted = true;
+
+  heroVideo.muted = true;
+  heroVideo.defaultMuted = true;
+  heroVideo.setAttribute("playsinline", "");
+  heroVideo.setAttribute("webkit-playsinline", "");
+
+  const attempt = () => {
+    const promise = heroVideo.play();
+    if(promise && promise.catch){
+      promise.catch(() => {
+        setTimeout(() => heroVideo.play().catch(() => {}), 300);
+      });
+    }
+  };
+
+  if(heroVideo.readyState >= 2){
+    attempt();
+  } else {
+    heroVideo.addEventListener("canplay", attempt, { once:true });
+  }
+
+  // Slow connection safety net — never leave it stuck paused.
+  setTimeout(() => {
+    if(heroVideo.paused && !heroVideo.ended) heroVideo.play().catch(() => {});
+  }, 1500);
+}
+
+/* Seamless-ish looping: native `loop` restarts by re-requesting the
+   start of the file, which is what caused the visible stutter/jump.
+   Seeking back just before the very end (rather than waiting for the
+   native end-of-file handling) removes that extra step. */
+if(heroVideo){
+  heroVideo.removeAttribute("loop");
+  heroVideo.loop = false;
+
+  heroVideo.addEventListener("timeupdate", () => {
+    if(heroVideo.duration && heroVideo.duration - heroVideo.currentTime < 0.15){
+      heroVideo.currentTime = 0;
+    }
+  });
+  heroVideo.addEventListener("ended", () => {
+    heroVideo.currentTime = 0;
+    heroVideo.play().catch(() => {});
+  });
+}
+
 function breakSeal(){
 
   if(started || revealed) return;
@@ -1379,6 +1487,8 @@ function breakSeal(){
   started = true;
 
   opening.classList.add("playing");
+
+  startHeroVideo();
 
   if(openVideo.currentTime > 0.05){
 
@@ -1499,115 +1609,20 @@ function revealSite(){
 
 
   /* =======================================================
-     HERO VIDEO — iPHONE / SAFARI FIX
+     HERO VIDEO
 
-     The Hero video is NOT played on page load.
-
-     It starts only after the envelope has finished.
+     Already started back in breakSeal() — it's been playing
+     quietly behind the overlay for the whole envelope video,
+     so by now it's smooth and mid-flow. Just make sure it
+     didn't get stuck paused; don't restart or reset it, since
+     that would reintroduce the exact jump/flash we're avoiding.
   ======================================================= */
 
   if(heroVideo){
-
-    /*
-      Explicitly tell Safari this is a muted inline video.
-    */
-
-    heroVideo.muted = true;
-    heroVideo.defaultMuted = true;
-
-    /*
-      Make sure inline playback is enabled.
-    */
-
-    heroVideo.setAttribute(
-      "playsinline",
-      ""
-    );
-
-    heroVideo.setAttribute(
-      "webkit-playsinline",
-      ""
-    );
-
-
-    const playHeroVideo = () => {
-
-      /*
-        Start from the beginning.
-      */
-
-      try{
-        heroVideo.currentTime = 0;
-      }catch(e){}
-
-
-      const promise = heroVideo.play();
-
-
-      if(promise && promise.catch){
-
-        promise.catch(() => {
-
-          /*
-            Safari may need a tiny delay immediately
-            after the opening overlay disappears.
-          */
-
-          setTimeout(() => {
-
-            heroVideo.play().catch(() => {});
-
-          },300);
-
-        });
-
-      }
-
-    };
-
-
-    /*
-      If enough data is already available,
-      play immediately.
-    */
-
-    if(heroVideo.readyState >= 2){
-
-      playHeroVideo();
-
-    }else{
-
-      /*
-        Otherwise wait until Safari says the
-        video can actually play.
-      */
-
-      heroVideo.addEventListener(
-        "canplay",
-        playHeroVideo,
-        {once:true}
-      );
-
+    startHeroVideo(); // no-op if already started; safety net if it wasn't
+    if(heroVideo.paused && !heroVideo.ended){
+      heroVideo.play().catch(() => {});
     }
-
-
-    /*
-      Extra fallback for slower iPhones / cellular networks.
-    */
-
-    setTimeout(() => {
-
-      if(
-        heroVideo.paused &&
-        !heroVideo.ended
-      ){
-
-        heroVideo.play().catch(() => {});
-
-      }
-
-    },1000);
-
   }
 
 
