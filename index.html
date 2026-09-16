@@ -81,14 +81,18 @@ h2.script{font-size:clamp(38px,8.6vw,64px);margin:0 0 26px}
 /* ---------- opening scene (envelope video) ---------- */
 #opening{
   position:fixed;inset:0;z-index:1000;background:#000;
+  width:100%;height:100vh;height:100dvh; /* iOS-safe viewport height */
   overflow:hidden;
   transition:opacity 1.1s ease;
+  -webkit-transform:translateZ(0); /* forces Safari to composite this layer, avoiding blank-frame stalls */
+  will-change:opacity;
 }
 #opening.open{opacity:0;pointer-events:none}
 #opening.removed{visibility:hidden}
 #openVideo{
   position:absolute;inset:0;width:100%;height:100%;
   object-fit:cover;object-position:center;background:#000;display:block;
+  opacity:1;visibility:visible; /* never hidden by default — this is what was rendering black */
   pointer-events:none; /* video itself is never the trigger — only the hotspot below is */
 }
 
@@ -132,6 +136,8 @@ h2.script{font-size:clamp(38px,8.6vw,64px);margin:0 0 26px}
 .hero-video{
   position:relative;z-index:2;width:100%;height:100%;
   object-fit:cover;object-position:center;display:block;background:#efe6d3;
+  opacity:1;visibility:visible;
+  -webkit-transform:translateZ(0);
 }
 .hero-cue{
   position:absolute;z-index:3;bottom:18px;left:0;right:0;text-align:center;
@@ -291,7 +297,7 @@ h2.script{font-size:clamp(38px,8.6vw,64px);margin:0 0 26px}
 <!-- OPENING -->
 <!-- OPENING SCENE — replace opening.mp4 with your envelope video (same folder) -->
 <div id="opening">
-  <video id="openVideo" playsinline muted preload="auto">
+  <video id="openVideo" playsinline webkit-playsinline muted preload="auto">
     <source src="./1782224012851_1_m6ww6v.mp4" type="video/mp4">
   </video>
 
@@ -307,17 +313,19 @@ h2.script{font-size:clamp(38px,8.6vw,64px);margin:0 0 26px}
 
 <main id="invitation">
 
-<!-- HERO: the poster -->
+<!-- HERO: custom video -->
 <section class="hero" aria-label="Welcome to the Nikkah ceremony of Umair and Hunaina">
   <div class="hero-blur" aria-hidden="true"></div>
-  <!-- Hero video — replace hero.mp4 with your own file (same folder as index.html).
-       No autoplay attribute on purpose: playback is started by JS only after
-       the envelope-opening sequence finishes, never on page load. -->
+  <!-- Hero video — replace hero.mp4 with your own file (same folder as index.html, exact
+       filename case matters on Vercel). It is primed (first frame rendered) as soon as
+       the page loads — while it's still hidden behind the envelope overlay — so it's
+       instantly ready with no black flash or delay once the envelope finishes. -->
   <video
     id="heroVideo"
     class="hero-video"
     muted
     playsinline
+    webkit-playsinline
     loop
     preload="auto"
     poster="umair.PNG"
@@ -475,20 +483,27 @@ const musicBtn  = document.getElementById("musicBtn");
 
 let started  = false;
 let revealed = false;
+let primed   = false;
+let heroPrimed = false;
+let fallbackTimer = null;
 
-/* Mobile browsers (especially iOS Safari) often refuse to paint any frame
+/* iOS Safari (especially over cellular) often refuses to paint any frame
    at all until playback has actually started once — leaving a black
-   rectangle instead of the envelope's first frame. The reliable fix is to
-   let it autoplay muted for an instant (which is allowed) and immediately
-   pause it, forcing that first frame to render and stay on screen. */
+   rectangle instead of the envelope's first frame. The fix is to let it
+   autoplay muted for an instant (allowed by iOS) and immediately pause it,
+   forcing that first frame to render and stay on screen. We attempt this
+   on every readiness event iOS might fire, and retry a few times, because
+   which event actually fires first is inconsistent across iOS versions. */
 function primeFirstFrame(){
-  if(started) return;
+  if(started || primed) return;
   const wasMuted = openVideo.muted;
   openVideo.muted = true;
+  openVideo.defaultMuted = true;
   const p = openVideo.play();
   if(p && p.then){
     p.then(() => {
       if(!started){
+        primed = true;
         openVideo.pause();
         openVideo.currentTime = 0;
         openVideo.muted = wasMuted;
@@ -496,10 +511,37 @@ function primeFirstFrame(){
     }).catch(() => { openVideo.muted = wasMuted; });
   }
 }
-if(openVideo.readyState >= 2){
-  primeFirstFrame();
-} else {
-  openVideo.addEventListener("loadeddata", primeFirstFrame, { once:true });
+["loadedmetadata","loadeddata","canplay","canplaythrough"].forEach(evt =>
+  openVideo.addEventListener(evt, primeFirstFrame, { once:true })
+);
+openVideo.load();                       // force iOS to start fetching immediately
+if(openVideo.readyState >= 1) primeFirstFrame();
+[120, 500, 1200].forEach(ms => setTimeout(primeFirstFrame, ms)); // retry net for slow connections
+window.addEventListener("pageshow", primeFirstFrame);           // iOS back/forward cache restores
+
+/* Same treatment for the hero video, done while it's still hidden behind
+   the envelope overlay (opacity/z-index, not display:none, so priming it
+   here doesn't flash anything). By the time revealSite() runs, its first
+   frame is already rendered and buffered, so it starts instantly with no
+   black flash or delay on iPhone. It stays muted throughout — no unmute
+   step is needed since this is a silent background video. */
+function primeHero(){
+  if(!heroVideo || heroPrimed) return;
+  const p = heroVideo.play();
+  if(p && p.then){
+    p.then(() => {
+      heroPrimed = true;
+      if(!revealed){ heroVideo.pause(); heroVideo.currentTime = 0; }
+    }).catch(() => {});
+  }
+}
+if(heroVideo){
+  ["loadedmetadata","loadeddata","canplay","canplaythrough"].forEach(evt =>
+    heroVideo.addEventListener(evt, primeHero, { once:true })
+  );
+  heroVideo.load();
+  if(heroVideo.readyState >= 1) primeHero();
+  [150, 600, 1500].forEach(ms => setTimeout(primeHero, ms));
 }
 
 /* Tap the wax seal — and only the wax seal — to begin. */
@@ -508,7 +550,7 @@ function breakSeal(){
   started = true;
   opening.classList.add("playing"); // fades the instruction, disables the hotspot
 
-  openVideo.currentTime = 0;
+  if(openVideo.currentTime > 0.05) openVideo.currentTime = 0; // avoid an unnecessary re-seek/stall
   openVideo.muted = false;          // this click is the gesture that allows sound
 
   openVideo.play().catch(() => {
@@ -518,10 +560,23 @@ function breakSeal(){
 }
 seal.addEventListener("click", breakSeal);
 
+/* Safety net: iOS occasionally never fires 'ended' (backgrounding, stalls).
+   Once real playback begins, schedule a fallback reveal slightly after the
+   video's known duration, so guests are never stuck looking at a black
+   screen. It's cancelled the moment 'ended' fires normally. */
+openVideo.addEventListener("playing", () => {
+  if(!started || revealed || fallbackTimer) return;
+  const dur = openVideo.duration;
+  if(isFinite(dur) && dur > 0){
+    fallbackTimer = setTimeout(revealSite, (dur - openVideo.currentTime) * 1000 + 800);
+  }
+});
+
 /* Video reaches its natural end — fade the whole opening layer away. */
 function revealSite(){
   if(revealed) return;
   revealed = true;
+  if(fallbackTimer){ clearTimeout(fallbackTimer); fallbackTimer = null; }
 
   opening.classList.add("open");    // starts the 1.1s cinematic fade (see CSS)
   document.body.classList.remove("locked");
@@ -529,10 +584,17 @@ function revealSite(){
 
   setTimeout(() => opening.classList.add("removed"), 1150);
 
-  // Hero video is only ever started here — never on page load.
+  // Hero video is only ever started here — never on page load. It was
+  // already primed above, so this should start instantly with no delay.
   if(heroVideo){
     heroVideo.currentTime = 0;
-    heroVideo.play().catch(() => {}); // already muted, so this should always succeed
+    const hp = heroVideo.play();
+    if(hp && hp.catch){
+      hp.catch(() => {
+        // one retry shortly after, in case iOS needed a beat post-transition
+        setTimeout(() => heroVideo.play().catch(() => {}), 300);
+      });
+    }
   }
 
   music.play().then(() => {
