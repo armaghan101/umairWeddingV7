@@ -120,7 +120,7 @@ h2.script{font-size:clamp(38px,8.6vw,64px);margin:0 0 26px}
 }
 #opening.playing .open-copy{opacity:0}
 
-/* ---------- hero (the poster) ---------- */
+/* ---------- hero (custom video) ---------- */
 .hero{
   position:relative;height:100svh;min-height:520px;
   display:grid;place-items:center;overflow:hidden;background:#efe6d3;
@@ -129,18 +129,15 @@ h2.script{font-size:clamp(38px,8.6vw,64px);margin:0 0 26px}
   position:absolute;inset:-6%;background:url("umair.PNG") center/cover no-repeat;
   filter:blur(26px) saturate(.9);opacity:.55;
 }
-.hero-poster{
-  position:relative;z-index:2;height:100%;width:100%;
-  object-fit:contain;object-position:center;
+.hero-video{
+  position:relative;z-index:2;width:100%;height:100%;
+  object-fit:cover;object-position:center;display:block;background:#efe6d3;
 }
 .hero-cue{
   position:absolute;z-index:3;bottom:18px;left:0;right:0;text-align:center;
   color:#6a5636;font-size:12px;letter-spacing:.3em;
 }
 .hero-cue span{display:block;font-size:17px;margin-top:4px;color:var(--gold)}
-@media(min-width:900px){
-  .hero-poster{width:auto;box-shadow:0 30px 90px rgba(60,40,20,.28)}
-}
 
 /* ---------- bismillah / quote ---------- */
 .bismillah{
@@ -313,7 +310,20 @@ h2.script{font-size:clamp(38px,8.6vw,64px);margin:0 0 26px}
 <!-- HERO: the poster -->
 <section class="hero" aria-label="Welcome to the Nikkah ceremony of Umair and Hunaina">
   <div class="hero-blur" aria-hidden="true"></div>
-  <img class="hero-poster" src="umair.PNG" alt="Welcome to the Nikkah ceremony of Umair and Hunaina">
+  <!-- Hero video — replace hero.mp4 with your own file (same folder as index.html).
+       No autoplay attribute on purpose: playback is started by JS only after
+       the envelope-opening sequence finishes, never on page load. -->
+  <video
+    id="heroVideo"
+    class="hero-video"
+    muted
+    playsinline
+    loop
+    preload="auto"
+    poster="umair.PNG"
+    aria-label="Umair and Hunaina">
+    <source src="./IMG_6263.mp4" type="video/mp4">
+  </video>
   <div class="hero-cue">Scroll<span>&#8595;</span></div>
 </section>
 
@@ -459,20 +469,38 @@ const RSVP_URL = ""; // paste your Google Form / RSVP link here
 const opening   = document.getElementById("opening");
 const openVideo = document.getElementById("openVideo");
 const seal      = document.getElementById("seal");
+const heroVideo = document.getElementById("heroVideo");
 const music     = document.getElementById("music");
 const musicBtn  = document.getElementById("musicBtn");
 
 let started  = false;
 let revealed = false;
 
-/* Video loads paused on its very first frame. Some mobile browsers won't
-   paint anything until a frame has been decoded, so nudge playback position
-   by a hair without ever calling play(). */
-openVideo.addEventListener("loadeddata", () => {
-  if(!started && openVideo.currentTime === 0){
-    try { openVideo.currentTime = 0.03; } catch(e){}
+/* Mobile browsers (especially iOS Safari) often refuse to paint any frame
+   at all until playback has actually started once — leaving a black
+   rectangle instead of the envelope's first frame. The reliable fix is to
+   let it autoplay muted for an instant (which is allowed) and immediately
+   pause it, forcing that first frame to render and stay on screen. */
+function primeFirstFrame(){
+  if(started) return;
+  const wasMuted = openVideo.muted;
+  openVideo.muted = true;
+  const p = openVideo.play();
+  if(p && p.then){
+    p.then(() => {
+      if(!started){
+        openVideo.pause();
+        openVideo.currentTime = 0;
+        openVideo.muted = wasMuted;
+      }
+    }).catch(() => { openVideo.muted = wasMuted; });
   }
-}, { once:true });
+}
+if(openVideo.readyState >= 2){
+  primeFirstFrame();
+} else {
+  openVideo.addEventListener("loadeddata", primeFirstFrame, { once:true });
+}
 
 /* Tap the wax seal — and only the wax seal — to begin. */
 function breakSeal(){
@@ -500,6 +528,12 @@ function revealSite(){
   window.scrollTo(0,0);
 
   setTimeout(() => opening.classList.add("removed"), 1150);
+
+  // Hero video is only ever started here — never on page load.
+  if(heroVideo){
+    heroVideo.currentTime = 0;
+    heroVideo.play().catch(() => {}); // already muted, so this should always succeed
+  }
 
   music.play().then(() => {
     musicBtn.classList.add("playing");
